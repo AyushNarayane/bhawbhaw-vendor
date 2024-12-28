@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 import Link from "next/link";
 import Image from 'next/image';
 import { FaTwitter, FaLinkedin, FaFacebook, FaInstagram } from 'react-icons/fa';
 
 function Footer() {
   return (
-    <div className="bg-[#85716B] text-white py-16 px-5 md:px-10">
+    <div className="bg-[#85716B] text-white py-16 px-5 md:px-10 font-light text-sm">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 lg:px-16">
         
         <div className="flex justify-center lg:justify-start mb-8 lg:mb-0">
@@ -19,8 +19,8 @@ function Footer() {
         </div>
 
         <div className="text-center lg:text-left">
-          <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
-          <ul className="text-xs font-extralight space-y-2">
+          <h3 className="font-semibold text-base mb-4">Quick Links</h3>
+          <ul className="space-y-2">
             <li><Link href="/about">About</Link></li>
             <li><Link href="/contact">Contact Us</Link></li>
             <li><Link href="/careers">Careers</Link></li>
@@ -29,19 +29,19 @@ function Footer() {
         </div>
 
         <div className="text-center lg:text-left">
-          <h3 className="font-semibold text-lg mb-4">Directories</h3>
-          <ul className="text-xs font-extralight space-y-2">
-          <li><Link href="/directory?option=sellers">Sellers</Link></li>
-          <li><Link href="/directory?option=jobs">Jobs</Link></li>
-          <li><Link href="/directory?option=newsletters">Newsletters</Link></li>
-          <li><Link href="/directory?option=services">Services</Link></li>
-          <li><Link href="/directory?option=products">Products</Link></li>
+          <h3 className="font-semibold text-base mb-4">Directories</h3>
+          <ul className="space-y-2">
+            <li><Link href="/directory?option=sellers">Sellers</Link></li>
+            <li><Link href="/directory?option=jobs">Jobs</Link></li>
+            <li><Link href="/directory?option=newsletters">Newsletters</Link></li>
+            <li><Link href="/directory?option=services">Services</Link></li>
+            <li><Link href="/directory?option=products">Products</Link></li>
           </ul>
         </div>
 
         <div className="text-center lg:text-left">
-          <h3 className="font-semibold">Contacts</h3>
-          <ul className="mt-4 space-y-4 text-xs font-extralight">
+          <h3 className="font-semibold text-base">Contacts</h3>
+          <ul className="mt-4 space-y-4">
             <li className="flex items-center justify-center lg:justify-start space-x-2">
               <Image
                 width="300"
@@ -76,7 +76,7 @@ function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-gray-300 mt-6 pt-4 text-center font-extralight text-sm text-gray-400 mx-auto w-full sm:flex sm:justify-between sm:px-10">
+      <div className="border-t border-gray-300 mt-6 pt-4 text-center mx-auto w-full sm:flex sm:justify-between sm:px-10">
         <p className="text-white mb-4 sm:mb-0">
           © 2025 Bhawbhaw.com
         </p>
@@ -90,7 +90,7 @@ function Footer() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default Footer;

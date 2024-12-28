@@ -1,4 +1,3 @@
-// BusinessDetails.js
 import React, { useState, useEffect } from "react";
 import toast from 'react-hot-toast';
 
@@ -11,6 +10,8 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
     gstNumber: "",
     panNumber: "",
     pinCode: "",
+    city: "",
+    state: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [focusedField, setFocusedField] = useState("");
@@ -35,6 +36,9 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
 
   const validatePan = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan);
   const validateGst = (gst) => gst.length === 15;
+
+  const validateEstablishmentYear = (year) => year >= 1950 && year <= 2025;
+
   const validatePinCode = async (pincode) => {
     try {
       const response = await fetch(
@@ -47,7 +51,18 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
           },
         }
       );
-      return response.ok;
+      const data = await response.json();
+      if (response.ok) {
+        setFormData((prevData) => ({
+          ...prevData,
+          city: data?.data?.city || "",
+          state: data?.data?.state || "",
+        }));
+        
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       console.error("Failed to validate pincode:", error);
       return false;
@@ -64,6 +79,11 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
         toast.error("Please fill in all fields");
         return;
       }
+    }
+
+    if (!validateEstablishmentYear(formData.establishmentYear)) {
+      toast.error("Year of establishment must be between 1950 and 2025.");
+      return;
     }
 
     const isPinCodeValid = await validatePinCode(formData.pinCode);
@@ -86,7 +106,6 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
     nextStep();
   };
 
-
   const isEmpty = (field) => isSubmitted && formData[field].trim() === "";
 
   return (
@@ -100,13 +119,12 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
             onChange={handleChange}
             onFocus={() => handleFocus("businessName")}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty("businessName")
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("businessName")
                 ? "border-red-500"
                 : focusedField === "businessName"
-                ? "border-gray-100"
-                : "border-gray-300"
-            } mt-1`}
+                  ? "border-gray-100"
+                  : "border-gray-300"
+              } mt-1`}
             placeholder="Name of Business"
           />
           {isEmpty("businessName") && (
@@ -124,13 +142,12 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
             onChange={handleChange}
             onFocus={() => handleFocus("establishmentYear")}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty("establishmentYear")
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("establishmentYear")
                 ? "border-red-500"
                 : focusedField === "establishmentYear"
-                ? "border-gray-100"
-                : "border-gray-300"
-            } mt-1`}
+                  ? "border-gray-100"
+                  : "border-gray-300"
+              } mt-1`}
             placeholder="Year of Establishment"
           />
           {isEmpty("establishmentYear") && (
@@ -150,13 +167,12 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
             onChange={handleChange}
             onFocus={() => handleFocus("brandName")}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty("brandName")
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("brandName")
                 ? "border-red-500"
                 : focusedField === "brandName"
-                ? "border-gray-100"
-                : "border-gray-300"
-            } mt-1`}
+                  ? "border-gray-100"
+                  : "border-gray-300"
+              } mt-1`}
             placeholder="Brand Name"
           />
           {isEmpty("brandName") && (
@@ -174,13 +190,12 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
             onChange={handleChange}
             onFocus={() => handleFocus("pickupAddress")}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty("pickupAddress")
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("pickupAddress")
                 ? "border-red-500"
                 : focusedField === "pickupAddress"
-                ? "border-gray-100"
-                : "border-gray-300"
-            } mt-1`}
+                  ? "border-gray-100"
+                  : "border-gray-300"
+              } mt-1`}
             placeholder="Pickup Address"
           />
           {isEmpty("pickupAddress") && (
@@ -192,7 +207,7 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
       </div>
 
       <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
-      <div>
+        <div>
           <input
             type="text"
             name="pinCode"
@@ -200,13 +215,12 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
             onChange={handleChange}
             onFocus={() => handleFocus("pinCode")}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty("pinCode")
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("pinCode")
                 ? "border-red-500"
                 : focusedField === "pinCode"
-                ? "border-gray-100"
-                : "border-gray-300"
-            } mt-1`}
+                  ? "border-gray-100"
+                  : "border-gray-300"
+              } mt-1`}
             placeholder="PIN Code"
           />
           {isEmpty("pinCode") && (
@@ -224,13 +238,12 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
             onChange={handleChange}
             onFocus={() => handleFocus("panNumber")}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty("panNumber")
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("panNumber")
                 ? "border-red-500"
                 : focusedField === "panNumber"
-                ? "border-gray-100"
-                : "border-gray-300"
-            } mt-1`}
+                  ? "border-gray-100"
+                  : "border-gray-300"
+              } mt-1`}
             placeholder="PAN Number"
           />
           {isEmpty("panNumber") && (
@@ -242,36 +255,41 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
       </div>
 
       <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
-      {!isService || isEcommerce ? (
-          <div>
-            <input
-              type="text"
-              name="gstNumber"
-              value={formData.gstNumber}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("gstNumber")}
-              onBlur={() => setFocusedField("")}
-              className={`w-full p-3 sm:text-md text-sm border-b ${
-                isEmpty("gstNumber") ? "border-red-500" : focusedField === "gstNumber" ? "border-gray-100" : "border-gray-300"
+        <div>
+          <input
+            type="text"
+            name="gstNumber"
+            value={formData.gstNumber}
+            onChange={handleChange}
+            onFocus={() => handleFocus("gstNumber")}
+            onBlur={handleBlur}
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("gstNumber")
+                ? "border-red-500"
+                : focusedField === "gstNumber"
+                  ? "border-gray-100"
+                  : "border-gray-300"
               } mt-1`}
-              placeholder="GST Number"
-            />
-            {isEmpty("gstNumber") && (
-              <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>
-            )}
-          </div>
-        ) : null}
-        
+            placeholder="GST Number (if applicable)"
+          />
+        </div>
       </div>
 
-      <div className="flex justify-end mt-6">
+      <div className="grid grid-cols-2 gap-5">
+      <button
+          className="py-2 px-6 bg-gray-400 text-black rounded-md mt-4"
+          onClick={prevStep}
+        >
+          Back
+        </button>
         <button
+          className="py-2 px-6 bg-gray-600 text-white rounded-md mt-4"
           onClick={handleSave}
-          className="px-4 py-2 bg-[#85716B] text-white rounded xs:text-sm text-xs"
         >
           Proceed to Bank Details
         </button>
+       
       </div>
+
     </div>
   );
 };

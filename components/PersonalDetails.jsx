@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from '@/firebase';
 
-const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
+const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phoneNumber: '',
     password: '',
     confirmPassword: '',
+    refCode: '',  // Add refCode in formData
   });
   const [loading, setLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [focusedField, setFocusedField] = useState('');
+  const [showPassword, setShowPassword] = useState(false);  // For toggling password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);  // For toggling confirm password visibility
 
   useEffect(() => {
     if (data && Object.keys(data).length > 0) {
@@ -19,26 +24,22 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
     }
   }, [data]);
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [focusedField, setFocusedField] = useState('');
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
-  
+
     const updatedFormData = { ...formData, [name]: newValue };
-  
     setFormData(updatedFormData);
     setData(updatedFormData);
   };
-    const handleFocus = (field) => setFocusedField(field);
 
+  const handleFocus = (field) => setFocusedField(field);
   const handleBlur = () => setFocusedField('');
 
   const handleSave = async () => {
-    const { fullName, email, phoneNumber, password, confirmPassword } = formData;
+    const { fullName, email, phoneNumber, password, confirmPassword, refCode } = formData;
 
-    if (!fullName || !email || !phoneNumber || !password || !confirmPassword) {
+    if (!fullName || !email || !phoneNumber || !password || !confirmPassword || !refCode) {
       toast.error("All fields are required");
       return;
     }
@@ -64,7 +65,13 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
       toast.error("Passwords do not match");
       return;
     }
-  
+
+    // Referral code validation
+    if (refCode.length !== 6 || /\d/.test(refCode)) {
+      toast.error("Referral code must be 6 characters long and contain no numbers");
+      return;
+    }
+
     try {
       setIsSubmitted(true);
       setLoading(true);
@@ -97,7 +104,6 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
       } else {
         toast.error(result.error || "Failed to save personal details");
       }
-
     } catch (error) {
       switch (error.code) {
         case 'auth/email-already-in-use':
@@ -136,9 +142,7 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
             onChange={handleChange}
             onFocus={() => handleFocus('fullName')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty('fullName') ? 'border-red-500' : focusedField === 'fullName' ? 'border-gray-100' : 'border-gray-300'
-            } mt-1`}
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('fullName') ? 'border-red-500' : focusedField === 'fullName' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
             placeholder="Full Name"
           />
           {isEmpty('fullName') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
@@ -152,9 +156,7 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
             onChange={handleChange}
             onFocus={() => handleFocus('email')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty('email') ? 'border-red-500' : focusedField === 'email' ? 'border-gray-100' : 'border-gray-300'
-            } mt-1`}
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('email') ? 'border-red-500' : focusedField === 'email' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
             placeholder="Email Address"
           />
           {isEmpty('email') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
@@ -170,26 +172,29 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
             onChange={handleChange}
             onFocus={() => handleFocus('phoneNumber')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty('phoneNumber') ? 'border-red-500' : focusedField === 'phoneNumber' ? 'border-gray-100' : 'border-gray-300'
-            } mt-1`}
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('phoneNumber') ? 'border-red-500' : focusedField === 'phoneNumber' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
             placeholder="Phone Number"
           />
           {isEmpty('phoneNumber') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
         </div>
-        <div>
+
+        <div className="relative">
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             name="password"
             value={formData.password}
             onChange={handleChange}
             onFocus={() => handleFocus('password')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty('password') ? 'border-red-500' : focusedField === 'password' ? 'border-gray-100' : 'border-gray-300'
-            } mt-1`}
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('password') ? 'border-red-500' : focusedField === 'password' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
             placeholder="Password"
           />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
+          >
+            {showPassword ? '🙈' : '👁️'}
+          </span>
           {isEmpty('password') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
         </div>
       </div>
@@ -197,18 +202,36 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid}) => {
       <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
         <div>
           <input
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
             onFocus={() => handleFocus('confirmPassword')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${
-              isEmpty('confirmPassword') ? 'border-red-500' : focusedField === 'confirmPassword' ? 'border-gray-100' : 'border-gray-300'
-            } mt-1`}
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('confirmPassword') ? 'border-red-500' : focusedField === 'confirmPassword' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
             placeholder="Confirm Password"
           />
+          <span
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
+          >
+           
+          </span>
           {isEmpty('confirmPassword') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
+        </div>
+
+        <div>
+          <input
+            type="text"
+            name="refCode"
+            value={formData.refCode}
+            onChange={handleChange}
+            onFocus={() => handleFocus('refCode')}
+            onBlur={handleBlur}
+            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('refCode') ? 'border-red-500' : focusedField === 'refCode' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
+            placeholder="Referral Code"
+          />
+          {isEmpty('refCode') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
         </div>
       </div>
 

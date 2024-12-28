@@ -16,32 +16,32 @@ export default function HomePage() {
     };
     useEffect(() => {
         const handleClickOutside = (event) => {
-          if (menuRef.current && !menuRef.current.contains(event.target)) {
-            setMenuOpen(false);
-          }
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setMenuOpen(false);
+            }
         };
-    
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-      }, []);
-    
-      const handleMenuItemClick = (section) => {
+    }, []);
+
+    const handleMenuItemClick = (section) => {
         handleScrollToSection(section);
         setMenuOpen(false);
-      };
+    };
 
     return (
         <div className="bg-[#F8F7F5]">
-             <header className="flex items-center justify-between px-5 py-1 bg-white shadow-md sticky top-0 z-10">
+            <header className="flex items-center justify-between px-5 py-1 bg-white shadow-md sticky top-0 z-10">
                 {/* Logo */}
                 <div className="flex items-center">
                     <Image
-                    src='/logoHeader.png'
-                    width="120"
-                    height="120"
-                    className="sm:w-24 w-20 cursor-pointer"
-                    onClick={() => handleScrollToSection('home')}
-                    alt="Logo"
+                        src='/logoHeader.png'
+                        width="120"
+                        height="120"
+                        className="sm:w-24 w-20 cursor-pointer"
+                        onClick={() => handleScrollToSection('home')}
+                        alt="Logo"
                     />
                 </div>
 
@@ -50,6 +50,13 @@ export default function HomePage() {
                     <button onClick={() => handleScrollToSection('howItWorks')} className="text-gray-700 hover:text-black transition">How It Works</button>
                     <button onClick={() => handleScrollToSection('services')} className="text-gray-700 hover:text-black transition">Services</button>
                     <button onClick={() => handleScrollToSection('highlight')} className="text-gray-700 hover:text-black transition">Highlight</button>
+                    <button
+                        onClick={() => router.push('/resources')}
+                        className="text-gray-700 hover:text-black transition"
+                    >
+                        Resources
+                    </button>
+
                 </nav>
 
                 <div className='flex gap-5'>
@@ -63,27 +70,27 @@ export default function HomePage() {
 
                 <div className="md:hidden">
                     <button onClick={() => setMenuOpen(!menuOpen)} className="text-gray-700 focus:outline-none">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
                     </button>
                 </div>
 
                 {menuOpen && (
                     <div ref={menuRef} className="absolute top-16 left-0 w-full bg-white shadow-md z-10 flex flex-col items-center space-y-4 py-4 md:hidden">
-                    <button onClick={() => handleMenuItemClick('ecommerce')} className="text-gray-700 hover:text-black transition">E-Commerce</button>
-                    <button onClick={() => handleMenuItemClick('howItWorks')} className="text-gray-700 hover:text-black transition">How It Works</button>
-                    <button onClick={() => handleMenuItemClick('services')} className="text-gray-700 hover:text-black transition">Services</button>
-                    <button onClick={() => handleMenuItemClick('highlight')} className="text-gray-700 hover:text-black transition">Highlight</button>
-                    <button className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" onClick={() => router.push('/dashboard')}>
-                        Dashboard
-                    </button>
-                    <button className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" onClick={() => { router.push('/signup'); setMenuOpen(false); }}>
-                        Become a Seller
-                    </button>
+                        <button onClick={() => handleMenuItemClick('ecommerce')} className="text-gray-700 hover:text-black transition">E-Commerce</button>
+                        <button onClick={() => handleMenuItemClick('howItWorks')} className="text-gray-700 hover:text-black transition">How It Works</button>
+                        <button onClick={() => handleMenuItemClick('services')} className="text-gray-700 hover:text-black transition">Services</button>
+                        <button onClick={() => handleMenuItemClick('highlight')} className="text-gray-700 hover:text-black transition">Highlight</button>
+                        <button className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" onClick={() => router.push('/dashboard')}>
+                            Dashboard
+                        </button>
+                        <button className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" onClick={() => { router.push('/signup'); setMenuOpen(false); }}>
+                            Become a Seller
+                        </button>
                     </div>
                 )}
-                </header>
+            </header>
 
             <div className="flex max-w-6xl mx-auto flex-col md:flex-row justify-start items-center w-full min-h-[80vh] px-5 pe-0 md:px-0 pt-10 md:pt-0">
                 <div className="relative w-full md:w-3/6 md:ml-10 mb-10 md:mb-0">
@@ -93,13 +100,13 @@ export default function HomePage() {
                 <div className="w-full md:text-left text-center max-w-xl md:w-1/2 pe-10 md:px-10 relative mx-auto md:pl-20">
                     <h1 className="text-2xl lg:text-5xl md:text-4xl sm:text-3xl !leading-tight font-extrabold text-black mb-4 md:mb-6">
                         <Image width="300" height="300" src='/glitterR.png' className='absolute right-0 w-8 md:w-11' />
-                        Connecting Pet Sellers with Pet Lovers <br/> Everywhere
+                        Connecting Pet Sellers with Pet Lovers <br /> Everywhere
                     </h1>
                     <p className="text-sm md:text-md text-gray-600 mb-4 md:mb-6 pr-0 md:pr-24">
                         Sell pet products, offer services, and grow your business with ease.
                     </p>
                     <div className="flex justify-center md:justify-start">
-                        <button className="bg-[#FFEB3B] hover:bg-yellow-500 text-black py-2 px-10 md:px-16 rounded-full font-bold" onClick={()=> router.push('/signin')}>
+                        <button className="bg-[#FFEB3B] hover:bg-yellow-500 text-black py-2 px-10 md:px-16 rounded-full font-bold" onClick={() => router.push('/signin')}>
                             Get Started Today
                         </button>
                     </div>
@@ -199,41 +206,41 @@ export default function HomePage() {
                 </div>
             </section>
 
-            
-                <div className='flex flex-row sm:m-16 m-1 pb-20 gap-7 items-center justify-center relative '>
-                    <Image width="300" height="300" src='/staggered1.png' className="w-24 md:w-32 " />
-                    <Image width="300" height="300" src='/shine1.png' className="w-6 md:w-8 top-0 left-20 absolute" />
-                    <Image width="300" height="300" src='/shine.png' className="w-6 md:w-8 bottom-10 left-20 absolute" />
-                    <Image width="300" height="300" src='/bubble.png' className="w-6 md:w-8 bottom-28 left-11 absolute" />
-                    <Image width="300" height="300" src='/shine.png' className="w-6 md:w-8 bottom-36 right-24 absolute" />
-                    <Image width="300" height="300" src='/shine1.png' className="w-4 md:w-5 bottom-28 right-0 left-80 mx-auto absolute" />
-                    <Image width="300" height="300" src='/bubble.png' className="w-6 md:w-8 top-16 right-20 absolute" />
-                    <Image width="300" height="300" src='/shine.png' className="w-4 md:w-5 top-12 right-96 absolute" />
 
-                    <div>
-                        <Image width="300" height="300" src='/staggered2.png' className="w-28 md:w-40 mb-10 " />
-                        <Image width="300" height="300" src='/staggered3.png' className="w-28 md:w-40 " />
-                    </div>
-                    <div>
-                        <Image width="300" height="300" src='/staggered4.png' className="w-24 md:w-32 mb-6" />
-                        <Image width="300" height="300" src='/staggered5.png' className="w-24 md:w-32 " />
-                    </div>
-                    <Image width="300" height="300" src='/staggered6.png' className="hidden md:block w-28 md:w-40 " />
-                    <div>
-                        <Image width="300" height="300" src='/staggered7.png' className="w-24 md:w-32 mb-6" />
-                        <Image width="300" height="300" src='/staggered8.png' className="w-24 md:w-32 " />
-                    </div>
-                    <Image width="300" height="300" src='/staggered9.png' className="hidden md:block w-24 md:w-32 " />
+            <div className='flex flex-row sm:m-16 m-1 pb-20 gap-7 items-center justify-center relative '>
+                <Image width="300" height="300" src='/staggered1.png' className="w-24 md:w-32 " />
+                <Image width="300" height="300" src='/shine1.png' className="w-6 md:w-8 top-0 left-20 absolute" />
+                <Image width="300" height="300" src='/shine.png' className="w-6 md:w-8 bottom-10 left-20 absolute" />
+                <Image width="300" height="300" src='/bubble.png' className="w-6 md:w-8 bottom-28 left-11 absolute" />
+                <Image width="300" height="300" src='/shine.png' className="w-6 md:w-8 bottom-36 right-24 absolute" />
+                <Image width="300" height="300" src='/shine1.png' className="w-4 md:w-5 bottom-28 right-0 left-80 mx-auto absolute" />
+                <Image width="300" height="300" src='/bubble.png' className="w-6 md:w-8 top-16 right-20 absolute" />
+                <Image width="300" height="300" src='/shine.png' className="w-4 md:w-5 top-12 right-96 absolute" />
+
+                <div>
+                    <Image width="300" height="300" src='/staggered2.png' className="w-28 md:w-40 mb-10 " />
+                    <Image width="300" height="300" src='/staggered3.png' className="w-28 md:w-40 " />
                 </div>
+                <div>
+                    <Image width="300" height="300" src='/staggered4.png' className="w-24 md:w-32 mb-6" />
+                    <Image width="300" height="300" src='/staggered5.png' className="w-24 md:w-32 " />
+                </div>
+                <Image width="300" height="300" src='/staggered6.png' className="hidden md:block w-28 md:w-40 " />
+                <div>
+                    <Image width="300" height="300" src='/staggered7.png' className="w-24 md:w-32 mb-6" />
+                    <Image width="300" height="300" src='/staggered8.png' className="w-24 md:w-32 " />
+                </div>
+                <Image width="300" height="300" src='/staggered9.png' className="hidden md:block w-24 md:w-32 " />
+            </div>
 
             <section id="services" className="py-32 px-6">
                 <div className="px-6 sm:px-10 lg:px-20 flex flex-col lg:flex-row justify-center items-start md:pb-16 pb-5">
                     <div className="lg:w-1/2">
                         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                        &quot;Simplify Pet Care Bookings And Grow Your Services&quot;
+                            &quot;Simplify Pet Care Bookings And Grow Your Services&quot;
                         </h1>
                         <p className="text-gray-600 text-base sm:text-lg mb-8 leading-relaxed">
-                        &quot;Offer your pet services online with our streamlined booking system. Whether you provide grooming, training, or veterinary services, our platform makes it easy for customers to book and pay, while you manage appointments and schedules effortlessly. Reach a wider audience and provide top-notch services to pet owners, all from one convenient platform.&quot;
+                            &quot;Offer your pet services online with our streamlined booking system. Whether you provide grooming, training, or veterinary services, our platform makes it easy for customers to book and pay, while you manage appointments and schedules effortlessly. Reach a wider audience and provide top-notch services to pet owners, all from one convenient platform.&quot;
                         </p>
                         <button className="bg-yellow-400 hover:bg-yellow-500 text-black py-2 px-6 sm:px-8 rounded-full font-bold">
                             DISCOVER
@@ -305,103 +312,103 @@ export default function HomePage() {
                         </div>
                     </div>
                 </div>
-                        <div className="py-8 px-10 relative">
-                            <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16 text-black">
-                            Why Choose Us?
-                            </h2>
+                <div className="py-8 px-10 relative">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16 text-black">
+                        Why Choose Us?
+                    </h2>
+                    <Image
+                        width="300"
+                        height="300"
+                        src="/shine1.png"
+                        className="absolute top-20 mx-auto right-0 left-0 w-7"
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-between items-center lg:items-start">
+                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
                             <Image
                                 width="300"
                                 height="300"
-                                src="/shine1.png"
-                                className="absolute top-20 mx-auto right-0 left-0 w-7"
+                                src="/work4.png"
+                                layout="intrinsic"
+                                className="w-52 min-h-36"
                             />
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-between items-center lg:items-start">
-                                <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                                    <Image
-                                        width="300"
-                                        height="300"
-                                        src="/work4.png"
-                                        layout="intrinsic"
-                                        className="w-52 min-h-36"
-                                    />
-                                    <p className="text-gray-900 text-sm md:text-lg max-w-xs">
-                                    Reach more pet lovers and grow your customer base.
-                                    </p>
-                                </div>
-
-                                <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                                    <Image
-                                        width="300"
-                                        height="300"
-                                        src="/tool.png"
-                                        layout="intrinsic"
-                                        className="w-52"
-                                    />
-                                    <p className="text-gray-900 text-sm md:text-lg max-w-xs">
-                                    Simple, efficient tools for managing your store and services.
-                                    </p>
-                                </div>
-
-                                <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                                    <Image
-                                        width="300"
-                                        height="300"
-                                        src="/work1.png"
-                                        layout="intrinsic"
-                                        className="mb-4 w-48"
-                                    />
-                                    <p className="text-gray-900 text-sm md:text-lg max-w-xs">
-                                    24/7 support to help you every step of the way.
-                                    </p>
-                                </div>
-                            </div>
+                            <p className="text-gray-900 text-sm md:text-lg max-w-xs">
+                                Reach more pet lovers and grow your customer base.
+                            </p>
                         </div>
+
+                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
+                            <Image
+                                width="300"
+                                height="300"
+                                src="/tool.png"
+                                layout="intrinsic"
+                                className="w-52"
+                            />
+                            <p className="text-gray-900 text-sm md:text-lg max-w-xs">
+                                Simple, efficient tools for managing your store and services.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
+                            <Image
+                                width="300"
+                                height="300"
+                                src="/work1.png"
+                                layout="intrinsic"
+                                className="mb-4 w-48"
+                            />
+                            <p className="text-gray-900 text-sm md:text-lg max-w-xs">
+                                24/7 support to help you every step of the way.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section className='relative max-w-4xl mx-auto sm:px-20 px-8'>
                 <h3 className='text-center text-3xl font-bold mt-20 mb-8'>FaQ</h3>
                 <Image
-                        width="300"
-                        height="300"
-                        src="/shine1.png"
-                        className="absolute mx-auto -top-10 xl:-right-20 right-20 w-5"
-                    />
+                    width="300"
+                    height="300"
+                    src="/shine1.png"
+                    className="absolute mx-auto -top-10 xl:-right-20 right-20 w-5"
+                />
                 <Accordion type="single" collapsible>
                     <AccordionItem value="item-1">
-                    <AccordionTrigger>What is the best type of food for my pet?</AccordionTrigger>
-                    <AccordionContent>
-                        The best food depends on your pet&apos;s species, breed, age, and health needs. Consult your vet for tailored recommendations.
-                    </AccordionContent>
+                        <AccordionTrigger>What is the best type of food for my pet?</AccordionTrigger>
+                        <AccordionContent>
+                            The best food depends on your pet&apos;s species, breed, age, and health needs. Consult your vet for tailored recommendations.
+                        </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-2">
-                    <AccordionTrigger>How often should I feed my pet?</AccordionTrigger>
-                    <AccordionContent>
-                        Most pets thrive on two meals per day. Puppies and kittens may require more frequent feeding, while some adults can eat once daily.
-                    </AccordionContent>
+                        <AccordionTrigger>How often should I feed my pet?</AccordionTrigger>
+                        <AccordionContent>
+                            Most pets thrive on two meals per day. Puppies and kittens may require more frequent feeding, while some adults can eat once daily.
+                        </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-3">
-                    <AccordionTrigger>Are grain-free diets good for pets?</AccordionTrigger>
-                    <AccordionContent>
-                        Grain-free diets may benefit pets with grain allergies, but they’re not necessary for all pets. Always consult your vet before making changes.
-                    </AccordionContent>
+                        <AccordionTrigger>Are grain-free diets good for pets?</AccordionTrigger>
+                        <AccordionContent>
+                            Grain-free diets may benefit pets with grain allergies, but they’re not necessary for all pets. Always consult your vet before making changes.
+                        </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-4">
-                    <AccordionTrigger>What services are available for pet grooming?</AccordionTrigger>
-                    <AccordionContent>
-                        Common services include bathing, hair trimming, nail clipping, ear cleaning, and flea/tick treatments.
-                    </AccordionContent>
+                        <AccordionTrigger>What services are available for pet grooming?</AccordionTrigger>
+                        <AccordionContent>
+                            Common services include bathing, hair trimming, nail clipping, ear cleaning, and flea/tick treatments.
+                        </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-5">
-                    <AccordionTrigger>How can I ensure my pet stays healthy?</AccordionTrigger>
-                    <AccordionContent>
-                        Regular vet check-ups, balanced diets, exercise, vaccinations, and preventive treatments for parasites help maintain pet health.
-                    </AccordionContent>
+                        <AccordionTrigger>How can I ensure my pet stays healthy?</AccordionTrigger>
+                        <AccordionContent>
+                            Regular vet check-ups, balanced diets, exercise, vaccinations, and preventive treatments for parasites help maintain pet health.
+                        </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-6">
-                    <AccordionTrigger>Do pets need dental care?</AccordionTrigger>
-                    <AccordionContent>
-                        Yes, pets need regular dental care to prevent gum disease and tooth decay. Brush their teeth or provide dental chews as recommended by your vet.
-                    </AccordionContent>
+                        <AccordionTrigger>Do pets need dental care?</AccordionTrigger>
+                        <AccordionContent>
+                            Yes, pets need regular dental care to prevent gum disease and tooth decay. Brush their teeth or provide dental chews as recommended by your vet.
+                        </AccordionContent>
                     </AccordionItem>
                 </Accordion>
             </section>
@@ -414,9 +421,9 @@ export default function HomePage() {
                 <Image width="300" height="300" src='/highlight5.png' className="sm:w-20 w-20 lg:w-36 h-auto" />
                 <Image width="300" height="300" src='/shine1.png' className="w-6 top-0 left-16 absolute" />
                 <Image width="300" height="300" src='/shine.png' className="w-6 bottom-0 right-14 absolute" />
-            </div> 
+            </div>
             <div className='h-32'></div>
-            <Footer/>
+            <Footer />
         </div >
     );
 }
