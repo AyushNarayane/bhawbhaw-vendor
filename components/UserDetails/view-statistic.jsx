@@ -30,7 +30,7 @@ export function ViewStatistic() {
         <button
           className="px-3 py-1 bg-gray-200 rounded-md text-sm"
         >
-          Yesterday
+          Today
         </button>
       </div>
       <ChartContainer
