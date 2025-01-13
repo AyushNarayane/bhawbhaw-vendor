@@ -1,0 +1,763 @@
+"use client";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/users/uiTwo/table";
+import { Button } from "@/components/users/uiTwo/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem
+} from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
+import { FiChevronDown } from "react-icons/fi";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAuth } from "@/hooks/auth-context";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Loader2,
+  X,
+  ChevronDown
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { doc, query, serverTimestamp, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  flexRender,
+} from "@tanstack/react-table";
+import Image from "next/image";
+
+const EmptyState = ({ onAddClick }) => (
+  <div className="flex flex-col items-center justify-center py-16">
+    <Image
+      src="/empty-coupon.svg"
+      alt="No queries"
+      width={192}
+      height={192}
+      className="mb-8"
+    />
+    <h3 className="text-xl font-semibold text-gray-700 mb-2">No Queries Found</h3>
+    <p className="text-gray-500 text-center max-w-sm mb-8">
+      You havent raised any queries yet. Click the button below to raise your first query.
+    </p>
+    <Button 
+      className="bg-[#B29581] hover:bg-[#a0846f] text-white"
+      onClick={onAddClick}
+    >
+      Raise Your First Query
+    </Button>
+  </div>
+);
+
+export default function OrdersPage() {
+  const { currentUser } = useAuth();
+  const [selectedTab, setSelectedTab] = useState("Raise new issue");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("Default");
+  const [filterOption, setFilterOption] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [openDialogue, setOpenDialogue] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [section, setSection] = useState("active");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [changed, setChanged] = useState(false);
+  const [isQueryAdded, setIsQueryAdded] = useState(false);
+  const [data, setData] = useState([]);
+  const [item, setItem] = useState();
+  const [sendModal, setSendModal] = useState(false);
+  const [viewModal, setViewModal] = useState(false);
+  const [selectedQueries, setSelectedQueries] = useState([]);
+  const [reopenMsg, setReopenedMsg] = useState("");
+  const [selectedQuery, setSelectedQuery] = useState("");
+  const [search, setSearch] = useState("id");
+
+  const ordersPerPage = 5;
+
+  const tabs = ["Raise new issue"];
+
+  const getQueries = async () => {
+    setLoading(true);
+    try {
+      if(currentUser){
+        const response = await fetch(`/api/getAllQueries?vendorId=${currentUser?.uid}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const queries = data.queries.map((query) => {
+            const timestampSeconds = query?.createdAt.seconds;
+            const timestampMilliseconds = query?.createdAt.nanoseconds;
+            const totalMilliseconds =
+              timestampSeconds * 1000 + timestampMilliseconds / 1000000;
+  
+            const date = new Date(totalMilliseconds);
+            return {
+              ...query,
+              createdAt: date.toLocaleString(),
+            };
+          });
+  
+          setData(queries);
+        } else {
+          console.log("Failed to fetch queries");
+        }
+      }      
+    } catch (error) {
+      console.log("Error fetching queries", error);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getQueries();
+  }, [changed, currentUser]);  
+
+  const queryTitles = [
+    "Account",
+    "Tech Support",
+    "Complaint and Feedback",
+    "Order related issue",
+  ];
+
+  const handleViewClick = async (queryId) => {
+    console.log(queryId);
+    try {
+      const response = await fetch(`/api/getQueryFromId?id=${queryId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setItem(data.query);
+        setSelectedQueries([queryId]);
+        setViewModal(true);
+      } else {
+        console.log("Query not found");
+      }
+    } catch (error) {
+      console.log("Error getting details for viewing a query", error);
+    }
+  };
+  
+
+  const handleSendClick = async (queryId) => {
+    console.log(queryId)
+    try {
+      const response = await fetch(`/api/getQueryFromId?id=${queryId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setItem(data);
+        setSelectedQuery(queryId);
+        setSelectedQueries([queryId]);
+        setSendModal(true);
+      }
+    } catch (error) {
+      console.log("Error getting details for viewing a query");
+    }
+  };
+
+  const handleReopen = async () => {
+    try {
+      setSendModal(false);
+      const response = await fetch(`/api/reopenQuery`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: selectedQuery,
+          reopenMsg,
+        }),
+      });
+  
+      if (response.ok) {
+        console.log("Resolve Message Sent");
+        getQueries()
+      } else {
+        console.log("Error reopening query");
+      }
+    } catch (error) {
+      console.log("Error Sending Resolve Message", error);
+    }
+  };
+
+  const columns = [
+    { accessorKey: "id", header: "Query ID" },
+    { accessorKey: "title", header: "Category" },
+    { accessorKey: "createdAt", header: "Date" },
+    { 
+      accessorKey: "status", 
+      header: "Status",
+      cell: ({ row }) => (
+        <div className="pt-5 text-red-400 flex items-center gap-1">
+          <p className="h-2 w-2 bg-red-500 rounded-full"></p>{" "}
+          {row.original.status}
+        </div>
+      )
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="rounded-full flex justify-center items-center"
+            onClick={() => handleViewClick(row.original.id)}>
+            View
+          </Button>
+          {row.original.status === "resolved" && (
+            <Button
+              variant="outline"
+              className="rounded-full flex justify-center items-center"
+              onClick={() => handleSendClick(row.original.id)}>
+              Re-Open
+            </Button>
+          )}
+        </div>
+      )
+    }
+  ];
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  const searchTitles = ["id", "title", "status", "createdAt"];
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between mb-3">
+        <h1 className="text-4xl font-bold mb-6">Helpdesk</h1>
+            <div className="flex justify-between items-center">
+            <div className="flex flex-wrap overflow-x-auto">
+            <div>
+              <Dialog onOpenChange={setOpenDialogue} open={openDialogue}>
+                <DialogTrigger asChild>
+                  <Button className="rounded-md text-sm bg-[#695d56] text-white mr-3">
+                    Raise an issue
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] bg-white">
+                  <DialogHeader>
+                    <DialogTitle>Raise a query</DialogTitle>
+                    <DialogDescription>
+                      Write the title and description of the query.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="flex flex-col items-center gap-2">
+                      <Label
+                        htmlFor="title"
+                        className="flex justify-start w-full ml-1"
+                      >
+                        Title
+                      </Label>
+                      <Select
+                        onValueChange={(e) => {
+                          setTitle(e);
+                        }}
+                      >
+                        <SelectTrigger className="bg-zinc-100 border-0 focus:ring-0 text-black ring-offset-0 focus:ring-offset-0 capitalize outline-none">
+                          <SelectValue placeholder="Select a query type" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          {queryTitles.map((mt) => (
+                            <SelectItem
+                              key={mt}
+                              value={mt}
+                              className="capitalize bg-white"
+                            >
+                              {mt}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <Label
+                        htmlFor="description"
+                        className="flex w-full justify-start"
+                      >
+                        Description
+                      </Label>
+                      <Textarea
+                        value={description}
+                        id="description"
+                        placeholder="Enter the description"
+                        className="col-span-3"
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter className="gap-2 flex flex-col">
+                    <Button
+                      disabled={title === "" || description === ""}
+                      type="button"
+                      className="bg-baw-baw-g3 text-white"
+                      onClick={async () => {
+                        setLoading(true);
+                        try {
+                          const response = await fetch('/api/addVendorQuery', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              vendorId: currentUser?.id,
+                              title,
+                              description,
+                              vendorUId: currentUser?.uid,
+                            }),
+                          });
+
+                          if (response.ok) {
+                            setTitle("");
+                            setDescription("");
+                            setChanged((curr) => !curr);
+                            setIsQueryAdded(true);
+                            toast.success("Successfully Generated the Query");
+                          } else {
+                            toast.error("Failed to generate the query");
+                          }
+                        } catch (error) {
+                          console.log("Error in adding query", error);
+                        }
+                        setLoading(false);
+                        setOpenDialogue(false);
+                      }}
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Generate Query"
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={() => {
+                        setTitle("");
+                        setDescription("");
+                        setOpenDialogue(false);
+                        setIsQueryAdded(false);
+                      }}
+                      variant="outline"
+                    >
+                      Close
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="mr-4 flex items-center">
+                Sort
+                <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white">
+              <DropdownMenuItem onSelect={() => setSortOption("Ascending")}>
+                Ascending
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setSortOption("Descending")}>
+                Descending
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="mr-4 flex items-center">
+                Filter
+                <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white">
+              <DropdownMenuItem onSelect={() => setFilterOption("All")}>
+                All
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setFilterOption("Completed")}>
+                Completed
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setFilterOption("Pending")}>
+                Pending
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Search Input */}
+          <div className="flex items-center">
+            <Input
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mr-4"
+            />
+            <Button variant="outline" onClick={()=> getQueries()}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4v5h.582a9.977 9.977 0 00-2.614 6.319A10.014 10.014 0 1012 2.05V7h4"
+                />
+              </svg>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Orders Table */}
+
+      <div className="w-full">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div className="w-full md:w-auto">
+            <Input
+              placeholder="Search by search type..."
+              value={table.getColumn(search)?.getFilterValue() ?? ""}
+              onChange={(event) =>
+                table.getColumn(search)?.setFilterValue(event.target.value)
+              }
+              className="w-full md:w-[300px] focus:outline-none rounded-lg bg-[#F3EAE7] text-[#85716B]"
+            />
+          </div>
+          
+          <Select onValueChange={setSearch}>
+            <SelectTrigger className="bg-zinc-100 border-0 focus:ring-0 text-black ring-offset-0 focus:ring-offset-0 capitalize outline-none w-1/4">
+              <SelectValue placeholder="Select a search type" />
+            </SelectTrigger>
+            <SelectContent>
+              {searchTitles.map((title) => (
+                <SelectItem key={title} value={title} className="capitalize">
+                  {title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto bg-white">
+                Columns <ChevronDown className="ml-2 h-4 w-4 bg-white" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="bg-[#F3EAE7] rounded-lg shadow-md mt-4">
+          <Table className="border-none">
+            <TableHeader className="min-w-10">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-muted/50">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="py-3 font-semibold">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row, index) => {
+                  const bgColor = index % 2 === 0 ? "bg-white" : "bg-[#F3EAE7]";
+                  return (
+                    <TableRow key={row.id} className="my-1 shadow-sm border-none overflow-hidden rounded-xl bg-transparent">
+                      {row.getVisibleCells().map((cell, cellIndex) => (
+                        <TableCell 
+                          key={cell.id} 
+                          className={`${bgColor} px-3 py-1 ${cellIndex === 0 ? 'rounded-s-xl' : ''} ${
+                            cellIndex === row.getVisibleCells().length - 1 ? 'rounded-e-xl' : ''
+                          }`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-[400px] text-center"
+                  >
+                    <EmptyState onAddClick={() => setOpenDialogue(true)} />
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {viewModal && (
+        <div
+          className="fixed z-[9999] inset-0 z-10 overflow-y-auto flex items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div
+            className="bg-white p-6 max-w-2xl rounded-xl shadow-xl w-3/4 max-h-4/5 overflow-y-auto"
+            style={{ maxHeight: "80vh" }}
+          >
+            <div className="flex justify-end pb-0">
+              <button
+                onClick={() => {
+                  setViewModal(false);
+                  setSelectedQueries([]);
+                }}
+                className="focus:outline-none"
+              >
+                <X />
+              </button>
+            </div>
+            <div className="flex justify-center items-center text-2xl font-semibold mb-4">
+              Query Details
+            </div>
+            <div>
+              <div className="flex flex-col">
+                <span className="m-2">Query Title</span>
+                <Input readOnly value={item.title} className="rounded-xl" />
+              </div>
+              <div className="flex flex-col">
+                <span className="m-2">Query Description</span>
+                <Textarea
+                  readOnly
+                  value={item.description}
+                  className="rounded-xl"
+                />
+              </div>
+            </div>
+            {item.status === "active" ? (
+              <></>
+            ) : (
+              <div className="flex flex-col">
+                <span className="m-2">Resolved Message</span>
+                <Textarea
+                  readOnly
+                  value={item.resolveMsg}
+                  className="rounded-xl"
+                />
+              </div>
+            )}
+            {item.status === "reopened" ||
+            (item.status === "closed" && item.reopenMsg) ? (
+              <div className="flex flex-col">
+                <span className="m-2">Re-Opened Message</span>
+                <Textarea
+                  readOnly
+                  value={item.reopenMsg}
+                  className="rounded-xl"
+                />
+              </div>
+            ) : (
+              <></>
+            )}
+            {item.status === "closed" ? (
+              <div className="flex flex-col">
+                <span className="m-2">Closed Message</span>
+                <Textarea
+                  readOnly
+                  value={item.closeMsg}
+                  className="rounded-xl"
+                />
+              </div>
+            ) : (
+              <></>
+            )}
+            <div className="flex flex-row justify-end mt-10">
+              <Button
+                type="submit"
+                className="mx-2 text-white bg-baw-baw-g3"
+                onClick={() => {
+                  setViewModal(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {sendModal && (
+        <div
+          className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div
+            className="bg-white p-6 rounded-xl shadow-xl w-3/4 max-h-4/5 overflow-y-auto"
+            style={{ maxHeight: "80vh" }}
+          >
+            <div className="flex justify-end pb-0">
+              <button
+                onClick={() => {
+                  setSendModal(false);
+                  setSelectedQueries([]);
+                }}
+                className="focus:outline-none"
+              >
+                <X />
+              </button>
+            </div>
+            {/* <div className="flex justify-center items-center text-2xl font-semibold mb-4">
+                Query Details
+              </div> */}
+            <div>
+              <div className="flex flex-col">
+                <span className="m-2">Subject</span>
+                {/* <Input
+                    readOnly
+                    value={item.queryId}
+                    className="rounded-xl"
+                  /> */}
+                <div className="rounded-xl border-solid border border-gray-400 p-4">
+                  {item.queryId}: Issue Re-Opened
+                </div>
+              </div>
+
+              {item.status === "closed" || item.status === "reopened" ? (
+                <div className="flex flex-col">
+                  <span className="m-2">Re-Opened Message</span>
+                  <Textarea
+                    readOnly
+                    value={item.reopenMsg}
+                    className="rounded-xl"
+                  />
+                </div>
+              ) : (
+                <></>
+              )}
+
+              <div className="flex flex-col">
+                <span className="m-2">Re-Opened Message</span>
+                <Textarea
+                  value={reopenMsg}
+                  onChange={(e) => setReopenedMsg(e.target.value)}
+                  className="rounded-xl"
+                />
+              </div>
+            </div>
+            <div className="flex flex-row justify-end mt-10">
+              <Button
+                type="submit"
+                className="mx-2 bg-baw-baw-g3 text-white"
+                onClick={() => {
+                  handleReopen();
+                }}
+              >
+                Re-Open
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
