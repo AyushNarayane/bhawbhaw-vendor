@@ -698,12 +698,18 @@ const handleFileUpload = (event) => {
           <Button
             className="px-4 py-2 bg-[#695d56] text-white hover:bg-[#574941]"
             onClick={() => {
-              setShowProducts("Add Product");
-              setActiveSection("Add Product");
-              setModalOpen(true);
+              if (showProducts === "My Products") {
+                setShowProducts("Add Product");
+                setActiveSection("Add Product");
+                setModalOpen(true);
+              } else {
+                setShowProducts("My Products");
+                setActiveSection("My Products");
+                setModalOpen(false);
+              }
             }}
           >
-            Add Product
+            {showProducts === "My Products" ? "Add Product" : "My Products"}
           </Button>
           <div className="flex space-x-2 items-center">
             <Input 
