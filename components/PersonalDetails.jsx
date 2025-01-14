@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from '@/firebase';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+
 const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -137,8 +138,8 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const isEmpty = (field) => isSubmitted && formData[field].trim() === '';
 
   return (
-    <div className="bg-white sm:px-8 py-8 px-3 rounded-lg shadow-lg font-montserrat">
-      <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
+    <div className="bg-white sm:px-8 px-4 py-8 rounded-lg shadow-lg font-montserrat">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-14">
         <div>
           <input
             type="text"
@@ -147,10 +148,13 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
             onChange={handleChange}
             onFocus={() => handleFocus('fullName')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('fullName') ? 'border-red-500' : focusedField === 'fullName' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
+            className={`w-full p-3 text-sm sm:text-md border-b ${
+              isEmpty('fullName') ? 'border-red-500' : 
+              focusedField === 'fullName' ? 'border-gray-100' : 'border-gray-300'
+            } mt-1`}
             placeholder="Full Name"
           />
-          {isEmpty('fullName') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
+          {isEmpty('fullName') && <p className="text-red-500 text-sm mt-1">Required field!</p>}
         </div>
 
         <div>
@@ -161,14 +165,17 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
             onChange={handleChange}
             onFocus={() => handleFocus('email')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('email') ? 'border-red-500' : focusedField === 'email' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
+            className={`w-full p-3 text-sm sm:text-md border-b ${
+              isEmpty('email') ? 'border-red-500' : 
+              focusedField === 'email' ? 'border-gray-100' : 'border-gray-300'
+            } mt-1`}
             placeholder="Email Address"
           />
-          {isEmpty('email') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
+          {isEmpty('email') && <p className="text-red-500 text-sm mt-1">Required field!</p>}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4 items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-14 mt-6">
         <div>
           <input
             type="text"
@@ -177,10 +184,13 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
             onChange={handleChange}
             onFocus={() => handleFocus('phoneNumber')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('phoneNumber') ? 'border-red-500' : focusedField === 'phoneNumber' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
+            className={`w-full p-3 text-sm sm:text-md border-b ${
+              isEmpty('phoneNumber') ? 'border-red-500' : 
+              focusedField === 'phoneNumber' ? 'border-gray-100' : 'border-gray-300'
+            } mt-1`}
             placeholder="Phone Number"
           />
-          {isEmpty('phoneNumber') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
+          {isEmpty('phoneNumber') && <p className="text-red-500 text-sm mt-1">Required field!</p>}
         </div>
 
         <div className="relative">
@@ -191,21 +201,24 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
             onChange={handleChange}
             onFocus={() => handleFocus('password')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('password') ? 'border-red-500' : focusedField === 'password' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
+            className={`w-full p-3 text-sm sm:text-md border-b ${
+              isEmpty('password') ? 'border-red-500' : 
+              focusedField === 'password' ? 'border-gray-100' : 'border-gray-300'
+            } mt-1 pr-10`}
             placeholder="Password"
           />
           <span
             onClick={() => setShowPassword(!showPassword)}
             className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
           >
-            {showPassword ? <AiOutlineEyeInvisible size={24} /> : <AiOutlineEye size={24} />}
+            {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
           </span>
-          {isEmpty('password') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
+          {isEmpty('password') && <p className="text-red-500 text-sm mt-1">Required field!</p>}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
-        <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-14 mt-6">
+        <div className="relative">
           <input
             type={showConfirmPassword ? 'text' : 'password'}
             name="confirmPassword"
@@ -213,16 +226,19 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
             onChange={handleChange}
             onFocus={() => handleFocus('confirmPassword')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty('confirmPassword') ? 'border-red-500' : focusedField === 'confirmPassword' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
+            className={`w-full p-3 text-sm sm:text-md border-b ${
+              isEmpty('confirmPassword') ? 'border-red-500' : 
+              focusedField === 'confirmPassword' ? 'border-gray-100' : 'border-gray-300'
+            } mt-1 pr-10`}
             placeholder="Confirm Password"
           />
           <span
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
           >
-           
+            {showConfirmPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
           </span>
-          {isEmpty('confirmPassword') && <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>}
+          {isEmpty('confirmPassword') && <p className="text-red-500 text-sm mt-1">Required field!</p>}
         </div>
 
         <div>
@@ -233,16 +249,17 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
             onChange={handleChange}
             onFocus={() => handleFocus('refCode')}
             onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${focusedField === 'refCode' ? 'border-gray-100' : 'border-gray-300'} mt-1`}
+            className={`w-full p-3 text-sm sm:text-md border-b ${
+              focusedField === 'refCode' ? 'border-gray-100' : 'border-gray-300'
+            } mt-1`}
             placeholder="Referral Code (Optional)"
           />
-          
         </div>
       </div>
 
-      <div className="w-full flex justify-end">
+      <div className="w-full flex justify-end mt-8">
         <button
-          className="bg-[#85716B] text-white px-4 py-2 rounded mt-4 xs:text-sm text-xs"
+          className="bg-[#85716B] text-white px-6 py-3 rounded-lg text-sm sm:text-base w-full sm:w-auto"
           onClick={handleSave}
         >
           {loading ? 'Loading...' : 'Proceed to Category Details'}

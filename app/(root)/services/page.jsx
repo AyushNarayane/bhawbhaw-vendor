@@ -475,34 +475,37 @@ const AddServicePage = () => {
 
   return (
     <div className="p-6">
-<h1 className="text-4xl font-bold text-[#3f3f3f]">Services</h1>
-<Button
-  variant="primary"
-  className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
-  onClick={() => {
-    setIsDialogOpen(true);
-    setIsEditMode(false);
-    setServiceData({
-      address: "",
-      phoneNumber: "",
-      pricePerHour: "",
-      serviceName: "",
-      title: "",
-      image: null,
-    });
-    setImagePreview(null);
-  }}
->
-  Add New Service
-</Button>
-<Button
-  variant="secondary"
-  className="ml-4 bg-[#85716B] text-white hover:bg-[#6b5a55]"
-  onClick={() => setIsProviderDialogOpen(true)}
->
-  Register as Service Provider
-</Button>
-
+<div className="flex justify-between items-center w-full">
+  <h1 className="text-4xl font-bold text-[#3f3f3f]">Services</h1>
+  <div className="flex space-x-4">
+    <Button
+      variant="primary"
+      className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
+      onClick={() => {
+        setIsDialogOpen(true);
+        setIsEditMode(false);
+        setServiceData({
+          address: "",
+          phoneNumber: "",
+          pricePerHour: "",
+          serviceName: "",
+          title: "",
+          image: null,
+        });
+        setImagePreview(null);
+      }}
+    >
+      Add New Service
+    </Button>
+    <Button
+      variant="secondary"
+      className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
+      onClick={() => setIsProviderDialogOpen(true)}
+    >
+      Register as Service Provider
+    </Button>
+  </div>
+</div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-white">
           <DialogHeader>

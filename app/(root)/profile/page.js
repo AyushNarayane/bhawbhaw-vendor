@@ -6,7 +6,7 @@ import { FiMail, FiUser, FiBriefcase, FiAward, FiShield, FiDollarSign, FiTag } f
 import { motion } from 'framer-motion';
 
 const InfoRow = ({ icon, label, value }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -39,12 +39,12 @@ export default function ProfilePage() {
         id: currentUser?.id || '',
         bankName: currentUser.bankDetails?.bankName || currentUser.bankingDetails?.bankName || '',
         accountNumber: currentUser.bankDetails?.accountNumber || currentUser.bankingDetails?.accountNumber || '',
-        ifscCode: currentUser.bankDetails?.ifsc|| currentUser.bankingDetails?.ifsc || '',
+        ifscCode: currentUser.bankDetails?.ifsc || currentUser.bankingDetails?.ifsc || '',
         accountHolderName: currentUser.bankDetails?.holderName || currentUser.bankingDetails?.holderName || '',
         categories: currentUser.businessDetails?.categories || [],
         gst: currentUser.businessDetails?.gstNumber || currentUser.taxDetails?.gst || '',
         pan: currentUser.businessDetails?.panNumber || currentUser.taxDetails?.pan || '',
-        
+
       });
     }
   }, [currentUser]);
@@ -55,7 +55,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Card */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-r from-[#B29581] to-[#C5A88F] rounded-3xl p-12 mb-12 shadow-xl relative overflow-hidden"
@@ -75,7 +75,7 @@ export default function ProfilePage() {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Card */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-1"
@@ -103,7 +103,7 @@ export default function ProfilePage() {
           </motion.div>
 
           {/* Info Cards */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-2 space-y-8"
@@ -130,31 +130,30 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Bank Details Section */}
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
                 <FiDollarSign className="mr-2" /> Bank Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoRow 
-                  icon={<FiDollarSign />} 
-                  label="Bank Name" 
-                  value={userData?.bankName} 
+                <InfoRow
+                  icon={<FiDollarSign />}
+                  label="Bank Name"
+                  value={userData?.ifscCode ? userData.ifscCode.slice(0, 4) : 'Not provided'}
                 />
-                <InfoRow 
-                  icon={<FiDollarSign />} 
-                  label="Account Number" 
-                  value={userData?.accountNumber ? `XXXX${userData.accountNumber.slice(-4)}` : 'Not provided'} 
+                <InfoRow
+                  icon={<FiDollarSign />}
+                  label="Account Number"
+                  value={userData?.accountNumber ? `XXXX${userData.accountNumber.slice(-4)}` : 'Not provided'}
                 />
-                <InfoRow 
-                  icon={<FiDollarSign />} 
-                  label="IFSC Code" 
-                  value={userData?.ifscCode} 
+                <InfoRow
+                  icon={<FiDollarSign />}
+                  label="IFSC Code"
+                  value={userData?.ifscCode}
                 />
-                <InfoRow 
-                  icon={<FiUser />} 
-                  label="Account Holder" 
-                  value={userData?.accountHolderName} 
+                <InfoRow
+                  icon={<FiUser />}
+                  label="Account Holder"
+                  value={userData?.accountHolderName}
                 />
               </div>
             </div>
@@ -165,15 +164,15 @@ export default function ProfilePage() {
                 <FiBriefcase className="mr-2" /> Tax Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoRow 
-                  icon={<FiBriefcase />} 
-                  label="GST Number" 
-                  value={userData?.gst} 
+                <InfoRow
+                  icon={<FiBriefcase />}
+                  label="GST Number"
+                  value={userData?.gst}
                 />
-                <InfoRow 
-                  icon={<FiBriefcase />} 
-                  label="PAN Number" 
-                  value={userData?.pan && `XXXXX${userData.pan.slice(-4)}`} 
+                <InfoRow
+                  icon={<FiBriefcase />}
+                  label="PAN Number"
+                  value={userData?.pan && `XXXXX${userData.pan.slice(-4)}`}
                 />
               </div>
             </div>
@@ -183,14 +182,14 @@ export default function ProfilePage() {
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
                 <FiTag className="mr-2" /> Product Categories
               </h3>
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="bg-white p-6 rounded-xl shadow-sm"
               >
                 <div className="flex flex-wrap gap-3">
                   {userData?.categories?.map((category, index) => (
-                    <span 
+                    <span
                       key={index}
                       className="px-4 py-2 bg-[#B29581]/10 text-[#B29581] rounded-full text-sm font-medium"
                     >
