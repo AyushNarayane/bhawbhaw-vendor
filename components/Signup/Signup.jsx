@@ -5,10 +5,11 @@ import DocumentUpload from '@/components/DocumentUpload';
 import BankDetailsForm from '@/components/BankDetailsForm';
 import React, { useState, useEffect } from 'react';
 import { AiOutlineCheck, AiOutlineRight, AiOutlineDown } from 'react-icons/ai';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from "next/navigation";
 import CategoryScreen from '@/components/CategoryScreen';
-import { db } from '@/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { db, auth } from '@/firebase';
+import { doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const MultiStepForm = () => {
   const router = useRouter();
@@ -63,7 +64,29 @@ const MultiStepForm = () => {
     if (!isFormDataComplete) {
         return;
     }
+
     try {
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.personalDetails.email,
+        formData.personalDetails.password // Make sure password is collected in PersonalDetails
+      );
+
+      const user = userCredential.user;
+      
+      // Create vendor document in Firestore
+      const vendorDocRef = doc(db, 'vendors', userId);
+      await setDoc(vendorDocRef, {
+        personalDetails: formData.personalDetails,
+        businessDetails: formData.businessDetails,
+        bankDetails: formData.bankDetails,
+        documents: formData.documentUpload,
+        status: 'unverified',
+        uid: user.uid,
+        createdAt: serverTimestamp()
+      });
+
       const response = await fetch('/api/auth/addAdditionalDetails', {
         method: 'POST',
         headers: {
@@ -75,7 +98,7 @@ const MultiStepForm = () => {
           bankDetails: formData.bankDetails,
           documents: formData.documentUpload,
           userId: userId,
-          uid: uid
+          uid: user.uid
         }),
       });
        
@@ -86,20 +109,6 @@ const MultiStepForm = () => {
       const result = await response.json();
       console.log('User data saved successfully:', result);
       
-      try {
-        const vendorDocRef = doc(db, 'vendors', userId);
-        if (vendorDocRef) {
-          await updateDoc(vendorDocRef, {
-            status: 'unverified'
-          });
-          console.log('Vendor status updated successfully');
-        } else {
-          console.error('Vendor document reference not found');
-        }
-      } catch (firestoreError) {
-        console.error('Error updating vendor status:', firestoreError);
-      }
-
       router.push('/signin');
     } catch (error) {
       console.error('Error submitting data:', error.message);

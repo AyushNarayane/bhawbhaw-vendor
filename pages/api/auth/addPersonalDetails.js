@@ -3,7 +3,7 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { personalDetails, userId, uid } = req.body;
+    const { personalDetails, userId } = req.body;
 
     try {
       const userDocRef = doc(db, 'vendors', userId);
@@ -14,7 +14,6 @@ export default async function handler(req, res) {
           email: personalDetails.email,
           phoneNumber: personalDetails.phoneNumber,
         },
-        uid: uid,
         status: 'initiated',
         createdAt: serverTimestamp(),
       });

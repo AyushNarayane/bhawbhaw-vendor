@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { storage } from '@/firebase';  // Remove db import
+import { storage, db, auth } from '@/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FaCloudUploadAlt } from 'react-icons/fa';
-import { AiOutlineLoading3Quarters, AiOutlineClose, AiOutlineCheck } from 'react-icons/ai';
-import { toast } from "react-hot-toast";
+import { AiOutlineClose, AiOutlineCheck, AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcommerce, isService }) => {
     const [documents, setDocuments] = useState({

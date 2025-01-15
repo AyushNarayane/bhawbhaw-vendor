@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth } from '@/firebase';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { db } from '@/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const [formData, setFormData] = useState({
@@ -77,59 +77,26 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
       setIsSubmitted(true);
       setLoading(true);
 
-      // Create new user
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const uid = userCredential.user.uid;
-      setUid(uid);
-
-      const response = await fetch('/api/auth/addPersonalDetails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Save to Firestore with password
+      const vendorRef = doc(db, 'vendors', userId);
+      await setDoc(vendorRef, {
+        personalDetails: {
+          name: fullName,
+          email: email,
+          phoneNumber: phoneNumber,
+          password: password // Add password to the document
         },
-        body: JSON.stringify({
-          personalDetails: {
-            fullName: formData.fullName,
-            email: formData.email,
-            phoneNumber: formData.phoneNumber,
-          },
-          userId,
-          uid: userCredential.user.uid,
-          status: 'isInitiated'
-        }),
-      });
+        status: 'initiated',
+        createdAt: new Date().toISOString(),
+        id: userId
+      }, { merge: true });
 
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || "Failed to save personal details");
-      }
-
-      await signOut(auth);
+      toast.success("Personal details saved successfully!");
       nextStep();
 
     } catch (error) {
-      console.error('Registration error:', error);
-      
-      // Handle auth errors
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          toast.error("Email is already registered. Please use a different email.");
-          break;
-        case 'auth/invalid-email':
-          toast.error("Invalid email format. Please enter a valid email.");
-          break;
-        case 'auth/weak-password':
-          toast.error("Password is too weak. Use a stronger password.");
-          break;
-        case 'auth/operation-not-allowed':
-          toast.error("This operation is not allowed. Please contact support.");
-          break;
-        case 'auth/network-request-failed':
-          toast.error("Network error. Please check your internet connection.");
-          break;
-        default:
-          toast.error(error.message || "Failed to complete registration. Please try again.");
-      }
+      console.error('Error saving personal details:', error);
+      toast.error("Failed to save personal details");
     } finally {
       setLoading(false);
     }
