@@ -160,9 +160,6 @@ export default function ProfilePage() {
 
             {/* Tax Information */}
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <FiBriefcase className="mr-2" /> Tax Information
-              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <InfoRow
                   icon={<FiBriefcase />}
@@ -178,27 +175,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Categories Section */}
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <FiTag className="mr-2" /> Product Categories
-              </h3>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="bg-white p-6 rounded-xl shadow-sm"
-              >
-                <div className="flex flex-wrap gap-3">
-                  {userData?.categories?.map((category, index) => (
-                    <span
-                      key={index}
-                      className="px-4 py-2 bg-[#B29581]/10 text-[#B29581] rounded-full text-sm font-medium"
-                    >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
+           
 
             {/* Security Section */}
             <div className="bg-white rounded-xl p-6 shadow-sm">

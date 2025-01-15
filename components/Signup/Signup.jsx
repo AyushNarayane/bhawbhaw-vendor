@@ -150,7 +150,7 @@ const MultiStepForm = () => {
   return (
     <>
       <nav className="bg-white shadow-md mb-2 sm:px-20 px-5 p-4 w-full flex justify-between items-center">
-        <div className="flex items-center">
+        <div className="flex items-center cursor-pointer" onClick={() => router.push('/')}>
           <img src="/logoHeader.png" alt="Logo" className="w-28 h-18 mr-2" />
         </div>
 
