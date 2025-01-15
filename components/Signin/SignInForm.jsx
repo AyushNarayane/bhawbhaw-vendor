@@ -25,7 +25,10 @@ const SignInForm = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser && user?.name) {
-        router.push("/dashboard");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1000);
+        // You might want to show a loading state here
       }
     });
     return () => unsubscribe();
@@ -76,7 +79,7 @@ const SignInForm = () => {
       );
   
       toast.success("Login successful");
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error signing in:", error);
       toast.error("An error occurred during login");

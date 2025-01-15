@@ -70,10 +70,8 @@ const DashBoard = () => {
   useEffect(() => {
     if (currentUser) {
       setLoading(false);
-    } else {
-      router.push('/login');
-    }
-  }, [currentUser, router]);
+    } 
+    }, [currentUser]);
 
   const dashboardData = [
     {
