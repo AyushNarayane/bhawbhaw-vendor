@@ -25,7 +25,7 @@ const SignInForm = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser && user?.name) {
-        router.push("/");
+        router.push("/dashboard");
       }
     });
     return () => unsubscribe();
@@ -48,9 +48,17 @@ const SignInForm = () => {
   
       const userDoc = querySnapshot.docs[0];
       const userEmail = userDoc.data().personalDetails?.email;
+      const isVerified = userDoc.data().isVerified; // Get verification status
   
       if (!userEmail) {
         throw new Error("Email not found in database");
+      }
+
+      // Check verification status
+      if (!isVerified) {
+        toast.error("Your account is pending verification. Please wait for admin approval.");
+        setLoading(false);
+        return;
       }
   
       await signInWithEmailAndPassword(auth, userEmail, password);
@@ -60,6 +68,7 @@ const SignInForm = () => {
           userData: {
             name: userDoc.data().personalDetails?.name || "Unknown",
             email: userEmail,
+            isVerified: isVerified, // Add verification status to user data
           },
           userId: userDoc.id,
         })
