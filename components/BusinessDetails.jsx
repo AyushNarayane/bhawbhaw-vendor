@@ -72,7 +72,7 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
   const handleSave = async () => {
     const requiredFields = isService && !isEcommerce
       ? ["businessName", "establishmentYear", "brandName", "pickupAddress", "panNumber", "pinCode"]
-      : ["businessName", "establishmentYear", "brandName", "pickupAddress", "gstNumber", "panNumber", "pinCode"];
+      : ["businessName", "establishmentYear", "brandName", "pickupAddress", "panNumber", "pinCode"];
 
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -255,25 +255,21 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
       </div>
 
       <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
-        <div>
-          <input
-            type="text"
-            name="gstNumber"
-            value={formData.gstNumber}
-            onChange={handleChange}
-            onFocus={() => handleFocus("gstNumber")}
-            onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("gstNumber")
-                ? "border-red-500"
-                : focusedField === "gstNumber"
-                  ? "border-gray-100"
-                  : "border-gray-300"
-              } mt-1`}
-            placeholder="GST Number (if applicable)"
-          />
-        </div>
-      </div>
-
+  <div>
+    <input
+      type="text"
+      name="gstNumber"
+      value={formData.gstNumber}
+      onChange={handleChange}
+      onFocus={() => handleFocus("gstNumber")}
+      onBlur={handleBlur}
+      className={`w-full p-3 sm:text-md text-sm border-b ${
+        focusedField === "gstNumber" ? "border-gray-100" : "border-gray-300"
+      } mt-1`}
+      placeholder="GST Number (if applicable)"
+    />
+  </div>
+</div>
       <div className="grid grid-cols-2 gap-5">
       <button
           className="py-2 px-6 bg-gray-400 text-black rounded-md mt-4"

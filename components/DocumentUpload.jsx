@@ -5,8 +5,11 @@ import { doc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import { AiOutlineClose, AiOutlineCheck, AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { useRouter } from 'next/navigation'; // Add this import at the top
+import { toast } from 'react-hot-toast'; // Add this import
 
 const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcommerce, isService }) => {
+    const router = useRouter();
     const [documents, setDocuments] = useState({
         gstCertificate: null,
         panCard: null,
@@ -16,7 +19,6 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
 
     const [uploading, setUploading] = useState(false);
     const [previews, setPreviews] = useState({});
-    const [success, setSuccess] = useState(false); // New state for success message
 
     const handleFileChange = (e, documentType) => {
         const file = e.target.files[0];
@@ -47,6 +49,7 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
         e.preventDefault();
         const requiredDocuments = ['panCard', 'aadhaarCard', 'photo'];
 
+        // Validate required documents
         for (const doc of requiredDocuments) {
             if (!documents[doc]) {
                 toast.error(`Please upload ${doc.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
@@ -54,72 +57,34 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
             }
         }
 
-        setUploading(true);
-        const urls = {};
+        try {
+            setUploading(true);
+            const urls = {};
 
-         {
             // Upload documents
             for (const [key, file] of Object.entries(documents)) {
-                if (file) {
+                if (file && file instanceof File) {  // Check if file is valid
                     const url = await uploadFile(file, key);
                     urls[key] = url;
                 }
             }
 
-            setData({ ...urls });
-
-            // Use API endpoint instead of direct Firestore update
-            const statusResponse = await fetch('/api/auth/updateVendorStatus', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId,
-                    status: 'isunverified',
-                    documents: urls
-                }),
-            });
-
-            if (!statusResponse.ok) {
-                throw new Error('Failed to update status');
-            }
-            
-            setUploading(false);
-            setSuccess(true);
-            
             if (typeof onSubmit === 'function') {
-                onSubmit();
+                await onSubmit();
             }
+
+            setData({ ...urls });
+            setUploading(false);
+            
+        } catch (error) {
+            console.error('Error uploading documents:', error);
+            toast.error('Failed to upload documents');
+            setUploading(false);
         }
-        // catch (error) {
-        //     console.error('Error uploading documents:', error);
-        //     toast.error('Failed to upload documents');
-        //     setUploading(false);
-        // }
     };
 
     return (
-        <div className="bg-white sm:px-8 py-8 px-3 rounded-lg shadow-md font-montserrat">
-            {/* Success message */}
-            {success && (
-                <div className="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-gray-700 z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                        <AiOutlineCheck size={40} color="#28a745" />
-                        <h2 className="text-2xl font-semibold mt-4">Account Registered Successfully!</h2>
-                        <button
-                            onClick={() => {
-                                setSuccess(false);
-                                // You can redirect the user here, e.g., router.push('/signin')
-                            }}
-                            className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                        >
-                            Proceed to Sign In
-                        </button>
-                    </div>
-                </div>
-            )}
-
+        <div className="bg-white sm:px-8 py-8 px-3 rounded-lg shadow-md font-montserrat relative">
             <div className="flex flex-wrap gap-10 justify-center">
                 {['panCard', 'aadhaarCard', 'photo'].map((documentType) => (
                     <div key={documentType} className="flex flex-col items-center mb-4 relative">

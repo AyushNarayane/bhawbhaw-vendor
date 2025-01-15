@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import CategoryScreen from '@/components/CategoryScreen';
 import { db, auth } from '@/firebase';
 import { doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { toast } from 'react-hot-toast';
 
 const MultiStepForm = () => {
   const router = useRouter();
@@ -30,6 +31,7 @@ const MultiStepForm = () => {
     documentUpload: {}
   });
   const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   useEffect(() => {
     setUserId('VID' + Math.floor(Date.now() / 1000));
@@ -62,7 +64,8 @@ const MultiStepForm = () => {
     formData.documentUpload && Object.keys(formData.documentUpload).length > 0;
 
     if (!isFormDataComplete) {
-        return;
+      toast.error('Please fill all required information');
+      return;
     }
 
     try {
@@ -106,12 +109,22 @@ const MultiStepForm = () => {
         throw new Error('Failed to submit data');
       }
       
-      const result = await response.json();
-      console.log('User data saved successfully:', result);
+      setShowSuccessDialog(true);
+      toast.success('Account created successfully!');
       
-      router.push('/signin');
     } catch (error) {
-      console.error('Error submitting data:', error.message);
+      console.error('Error submitting data:', error);
+      
+      // Handle specific Firebase auth errors
+      const errorMessage = {
+        'auth/email-already-in-use': 'This email is already registered',
+        'auth/invalid-email': 'Invalid email address',
+        'auth/operation-not-allowed': 'Email/password sign up is not enabled',
+        'auth/weak-password': 'Password should be at least 6 characters',
+        'default': 'An error occurred during registration'
+      }[error.code] || error.message;
+
+      toast.error(errorMessage);
     }
   };
 
@@ -158,6 +171,29 @@ const MultiStepForm = () => {
 
   return (
     <>
+      {showSuccessDialog && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[99999]">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-md mx-4">
+            <div className="mb-4 flex justify-center">
+              <div className="rounded-full bg-green-100 p-3">
+                <AiOutlineCheck className="text-green-500" size={50} />
+              </div>
+            </div>
+            <h2 className="text-2xl font-semibold mb-4">Account Created Successfully!</h2>
+            <p className="text-gray-600 mb-6">Your account has been created. Please sign in to continue.</p>
+            <button
+              onClick={() => {
+                setShowSuccessDialog(false);
+                router.push('/signin');
+              }}
+              className="w-full bg-[#85716B] text-white py-3 rounded-lg hover:bg-[#726159] transition-colors"
+            >
+              Proceed to Sign In
+            </button>
+          </div>
+        </div>
+      )}
+
       <nav className="bg-white shadow-md mb-2 sm:px-20 px-5 p-4 w-full flex justify-between items-center">
         <div className="flex items-center cursor-pointer" onClick={() => router.push('/')}>
           <img src="/logoHeader.png" alt="Logo" className="w-28 h-18 mr-2" />

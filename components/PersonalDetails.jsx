@@ -62,6 +62,16 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
       return;
     }
 
+    if (!/\d/.test(password)) {
+      toast.error("Password must contain at least one number");
+      return;
+    }
+
+    if (!/[a-zA-Z]/.test(password)) {
+      toast.error("Password must contain at least one letter");
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
