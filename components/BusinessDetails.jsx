@@ -15,6 +15,8 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
   }); 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [focusedField, setFocusedField] = useState("");
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeError, setPincodeError] = useState('');
 
   useEffect(() => {
     setFormData(data);
@@ -40,6 +42,14 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
   const validateEstablishmentYear = (year) => year >= 1950 && year <= 2025;
 
   const validatePinCode = async (pincode) => {
+    if (!pincode || pincode.length !== 6) {
+      setPincodeError('PIN code must be 6 digits');
+      return false;
+    }
+
+    setPincodeLoading(true);
+    setPincodeError('');
+
     try {
       const response = await fetch(
         `https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/${pincode}`,
@@ -52,19 +62,25 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
         }
       );
       const data = await response.json();
-      if (response.ok) {
+      
+      setPincodeLoading(false);
+      
+      if (response.ok && data?.data?.city) {
+        setPincodeError('');
         setFormData((prevData) => ({
           ...prevData,
           city: data?.data?.city || "",
           state: data?.data?.state || "",
         }));
-        
         return true;
       } else {
+        setPincodeError('Invalid PIN code');
         return false;
       }
     } catch (error) {
       console.error("Failed to validate pincode:", error);
+      setPincodeError('Failed to validate PIN code');
+      setPincodeLoading(false);
       return false;
     }
   };
@@ -86,9 +102,12 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
       return;
     }
 
+    setPincodeLoading(true);
     const isPinCodeValid = await validatePinCode(formData.pinCode);
+    setPincodeLoading(false);
+
     if (!isPinCodeValid) {
-      toast.error("Invalid PIN code.");
+      toast.error("Please enter a valid PIN code");
       return;
     }
 
@@ -214,19 +233,31 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
             value={formData.pinCode}
             onChange={handleChange}
             onFocus={() => handleFocus("pinCode")}
-            onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("pinCode")
-                ? "border-red-500"
-                : focusedField === "pinCode"
-                  ? "border-gray-100"
-                  : "border-gray-300"
-              } mt-1`}
+            onBlur={async (e) => {
+              handleBlur();
+              if (e.target.value) {
+                await validatePinCode(e.target.value);
+              }
+            }}
+            maxLength={6}
+            className={`w-full p-3 sm:text-md text-sm border-b ${
+              pincodeError ? 'border-red-500' : 
+              isEmpty("pinCode") ? "border-red-500" :
+              focusedField === "pinCode" ? "border-gray-100" : "border-gray-300"
+            } mt-1`}
             placeholder="PIN Code"
           />
-          {isEmpty("pinCode") && (
-            <p className="text-red-500 text-sm mt-1 text-end">
-              Required field!
-            </p>
+          {pincodeLoading && (
+            <span className="absolute right-3 transform -translate-y-8">
+              <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+          )}
+          {pincodeError && <p className="text-red-500 text-sm mt-1">{pincodeError}</p>}
+          {isEmpty("pinCode") && !pincodeError && (
+            <p className="text-red-500 text-sm mt-1 text-end">Required field!</p>
           )}
         </div>
 
