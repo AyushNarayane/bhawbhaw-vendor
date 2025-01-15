@@ -47,15 +47,16 @@ const SignInForm = () => {
       }
   
       const userDoc = querySnapshot.docs[0];
-      const userEmail = userDoc.data().personalDetails?.email;
-      const isVerified = userDoc.data().isVerified; // Get verification status
+      const userData = userDoc.data();
+      const userEmail = userData.personalDetails?.email;
+      const status = userData.status; // Get status field
   
       if (!userEmail) {
         throw new Error("Email not found in database");
       }
 
-      // Check verification status
-      if (!isVerified) {
+      // Check if status is "verified"
+      if (status !== "verified") {
         toast.error("Your account is pending verification. Please wait for admin approval.");
         setLoading(false);
         return;
@@ -66,9 +67,9 @@ const SignInForm = () => {
       dispatch(
         setUser({
           userData: {
-            name: userDoc.data().personalDetails?.name || "Unknown",
+            name: userData.personalDetails?.name || "Unknown",
             email: userEmail,
-            isVerified: isVerified, // Add verification status to user data
+            status: status, // Include status in user data
           },
           userId: userDoc.id,
         })
@@ -83,7 +84,6 @@ const SignInForm = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="bg-white max-h-screen p-8 rounded-3xl shadow-lg w-3/4 my-8 mx-4 max-lg:w-full lg:pt-10 lg:px-20 lg:pb-32">
