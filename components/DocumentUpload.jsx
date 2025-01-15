@@ -19,18 +19,34 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
 
     const [uploading, setUploading] = useState(false);
     const [previews, setPreviews] = useState({});
+    const [inputKeys, setInputKeys] = useState({
+        gstCertificate: 0,
+        panCard: 0,
+        aadhaarCard: 0,
+        photo: 0,
+    });
 
     const handleFileChange = (e, documentType) => {
         const file = e.target.files[0];
         if (file) {
+            if (previews[documentType]) {
+                URL.revokeObjectURL(previews[documentType]);
+            }
             setDocuments({ ...documents, [documentType]: file });
             setPreviews({ ...previews, [documentType]: URL.createObjectURL(file) });
         }
     };
 
     const removeFile = (documentType) => {
+        if (previews[documentType]) {
+            URL.revokeObjectURL(previews[documentType]);
+        }
         setDocuments({ ...documents, [documentType]: null });
         setPreviews({ ...previews, [documentType]: null });
+        setInputKeys(prev => ({
+            ...prev,
+            [documentType]: prev[documentType] + 1
+        }));
     };
 
     const uploadFile = async (file, documentType) => {
@@ -114,6 +130,7 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
                             </div>
 
                             <input
+                                key={inputKeys[documentType]}
                                 id={`${documentType}-upload`}
                                 type="file"
                                 accept="image/*,application/pdf"
@@ -158,6 +175,7 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
                             </div>
 
                             <input
+                                key={inputKeys.gstCertificate}
                                 id="gstCertificate-upload"
                                 type="file"
                                 accept="image/*,application/pdf"
