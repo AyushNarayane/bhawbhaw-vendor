@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
       await setDoc(userDocRef, {
         personalDetails: {
-          name: personalDetails.fullName,
+          name: personalDetails.name,
           email: personalDetails.email,
           phoneNumber: personalDetails.phoneNumber,
           isEcommerce: personalDetails.isEcommerce,

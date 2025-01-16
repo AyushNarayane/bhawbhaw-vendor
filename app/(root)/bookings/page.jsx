@@ -47,7 +47,7 @@ import {
 
 const BookingTable = ({ data, columns, onView, onChangeStatus }) => {
   const [search, setSearch] = useState("bookingID");
-  const searchTitles = ["bookingID", "serviceName", "fullName", "phoneNumber"];
+  const searchTitles = ["bookingID", "serviceName", "name", "phoneNumber"];
 
   const table = useReactTable({
     data,
@@ -331,7 +331,7 @@ const BookingPage = () => {
       },
       {
         header: "Full Name",
-        accessorKey: "contactInfo.fullName",
+        accessorKey: "contactInfo.name",
       },
       {
         header: "Contact",
@@ -402,7 +402,7 @@ const BookingPage = () => {
                 <div className="space-y-2">
                   <p><strong>Booking ID:</strong> {viewBooking.bookingID}</p>
                   <p><strong>Service:</strong> {viewBooking.selectedService.serviceName}</p>
-                  <p><strong>Full Name:</strong> {viewBooking.contactInfo.fullName}</p>
+                  <p><strong>Full Name:</strong> {viewBooking.contactInfo.name}</p>
                   <p><strong>Email:</strong> {viewBooking.contactInfo.email}</p>
                   <p><strong>Phone:</strong> {viewBooking.contactInfo.phoneNumber}</p>
                   <p><strong>Address:</strong> {viewBooking.contactInfo.address}</p>

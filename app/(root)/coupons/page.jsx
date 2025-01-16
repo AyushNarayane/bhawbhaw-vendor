@@ -96,9 +96,9 @@ const CouponTable = ({ data, columns, onToggleStatus, onAddClick, activeTab }) =
 
       <div className="bg-white rounded-lg shadow-md mt-4">
         <Table className="border-none">
-          <TableHeader className="min-w-10">
+          <TableHeader className="min-w-10 bg-[#F3EAE7]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-gray-50">
+              <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-gray-50 bg-[#F3EAE7]">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} className="py-3 font-semibold">
                     {header.isPlaceholder
@@ -160,8 +160,8 @@ const CouponTable = ({ data, columns, onToggleStatus, onAddClick, activeTab }) =
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+         
+        
         </div>
         <div className="space-x-2">
           <Button
@@ -485,7 +485,7 @@ const CouponsPage = () => {
       </div>
 
       {/* Tab buttons */}
-      <div className="flex md:flex-wrap flex-nowrap sm:mb-6 mb-2 table-scrollbar overflow-x-auto">
+      <div className="">
         {tabs.map((tab) => (
           <Button
             key={tab}
@@ -511,7 +511,7 @@ const CouponsPage = () => {
           />
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-md">
+        <div className="bg-white rounded-lg ">
           <CouponTable 
             data={filteredCoupons}
             columns={columns}

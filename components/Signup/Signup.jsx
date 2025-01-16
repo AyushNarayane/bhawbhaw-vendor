@@ -20,7 +20,7 @@ const MultiStepForm = () => {
   const [userId, setUserId] = useState('');
   const [formData, setFormData] = useState({
     personalDetails: { 
-      fullName: '',
+      name: '',
       email: '',
       phoneNumber: '',
       isEcommerce: false,

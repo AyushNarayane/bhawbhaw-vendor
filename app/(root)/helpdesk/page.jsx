@@ -467,54 +467,10 @@ export default function OrdersPage() {
 
       <div className="w-full">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <div className="w-full md:w-auto">
-            <Input
-              placeholder="Search by search type..."
-              value={table.getColumn(search)?.getFilterValue() ?? ""}
-              onChange={(event) =>
-                table.getColumn(search)?.setFilterValue(event.target.value)
-              }
-              className="w-full md:w-[300px] focus:outline-none rounded-lg bg-[#F3EAE7] text-[#85716B]"
-            />
-          </div>
+         
           
-          <Select onValueChange={setSearch}>
-            <SelectTrigger className="bg-zinc-100 border-0 focus:ring-0 text-black ring-offset-0 focus:ring-offset-0 capitalize outline-none w-1/4">
-              <SelectValue placeholder="Select a search type" />
-            </SelectTrigger>
-            <SelectContent>
-              {searchTitles.map((title) => (
-                <SelectItem key={title} value={title} className="capitalize">
-                  {title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto bg-white">
-                Columns <ChevronDown className="ml-2 h-4 w-4 bg-white" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         <div className="bg-[#F3EAE7] rounded-lg shadow-md mt-4">

@@ -6,7 +6,7 @@ import { doc, setDoc } from 'firebase/firestore';
 
 const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
     phoneNumber: '',
     password: '',
@@ -38,9 +38,9 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const handleBlur = () => setFocusedField('');
 
   const handleSave = async () => {
-    const { fullName, email, phoneNumber, password, confirmPassword, refCode } = formData;
+    const { name, email, phoneNumber, password, confirmPassword, refCode } = formData;
 
-    if (!fullName || !email || !phoneNumber || !password || !confirmPassword) {
+    if (!name || !email || !phoneNumber || !password || !confirmPassword) {
       toast.error("All fields are required");
       return;
     }
@@ -91,7 +91,7 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
       const vendorRef = doc(db, 'vendors', userId);
       await setDoc(vendorRef, {
         personalDetails: {
-          name: fullName,
+          name: name,
           email: email,
           phoneNumber: phoneNumber,
           password: password // Add password to the document
@@ -120,18 +120,18 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
         <div>
           <input
             type="text"
-            name="fullName"
-            value={formData.fullName}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
-            onFocus={() => handleFocus('fullName')}
+            onFocus={() => handleFocus('name')}
             onBlur={handleBlur}
             className={`w-full p-3 text-sm sm:text-md border-b ${
-              isEmpty('fullName') ? 'border-red-500' : 
-              focusedField === 'fullName' ? 'border-gray-100' : 'border-gray-300'
+              isEmpty('name') ? 'border-red-500' : 
+              focusedField === 'name' ? 'border-gray-100' : 'border-gray-300'
             } mt-1`}
             placeholder="Full Name"
           />
-          {isEmpty('fullName') && <p className="text-red-500 text-sm mt-1">Required field!</p>}
+          {isEmpty('name') && <p className="text-red-500 text-sm mt-1">Required field!</p>}
         </div>
 
         <div>
