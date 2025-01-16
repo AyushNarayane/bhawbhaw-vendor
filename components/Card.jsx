@@ -9,6 +9,10 @@ const Card = ({ vendor1, num_vendor1, vendor2, num_vendor2, img1, img2 }) => {
         <div>
           <h1>{vendor1}</h1>
           <p className="font-bold text-xl">{num_vendor1}</p>
+
+
+
+          
         </div>
         <Image src={img1} width={30} height={30} alt="Vendor Image 1" />
       </div>
