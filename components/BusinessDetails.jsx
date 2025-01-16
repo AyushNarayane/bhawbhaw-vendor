@@ -42,7 +42,7 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
   const validateEstablishmentYear = (year) => year >= 1950 && year <= 2025;
 
   const validatePinCode = async (pincode) => {
-    if (!pincode || pincode.length !== 6) {
+    if (!pincode || pincode.length !== 6 || !/^\d+$/.test(pincode)) {
       setPincodeError('PIN code must be 6 digits');
       return false;
     }
@@ -52,31 +52,26 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
 
     try {
       const response = await fetch(
-        `https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/${pincode}`,
-        {
-          method: "GET",
-          headers: {
-            "X-RapidAPI-Key": "f124f1d4b3msh88b845451b505a0p18243bjsnce20548aafe4",
-            "X-RapidAPI-Host": "india-pincode-with-latitude-and-longitude.p.rapidapi.com",
-          },
-        }
+        `https://api.postalpincode.in/pincode/${pincode}`
       );
       const data = await response.json();
       
       setPincodeLoading(false);
       
-      if (response.ok && data?.data?.city) {
-        setPincodeError('');
-        setFormData((prevData) => ({
-          ...prevData,
-          city: data?.data?.city || "",
-          state: data?.data?.state || "",
-        }));
-        return true;
-      } else {
-        setPincodeError('Invalid PIN code');
-        return false;
+      if (data && data[0]?.Status === "Success") {
+        const postOffice = data[0]?.PostOffice?.[0];
+        if (postOffice) {
+          setFormData(prev => ({
+            ...prev,
+            city: postOffice.District || "",
+            state: postOffice.State || "",
+          }));
+          return true;
+        }
       }
+      
+      setPincodeError('Invalid PIN code');
+      return false;
     } catch (error) {
       console.error("Failed to validate pincode:", error);
       setPincodeError('Failed to validate PIN code');
@@ -301,15 +296,15 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
     />
   </div>
 </div>
-      <div className="grid grid-cols-2 gap-5">
+      <div className="flex justify-between mt-6">
       <button
-          className="py-2 px-6 bg-gray-400 text-black rounded-md mt-4"
+          className="px-4 py-2 bg-gray-300 rounded xs:text-sm text-xs"
           onClick={prevStep}
         >
           Back
         </button>
         <button
-          className="py-2 px-6 bg-gray-600 text-white rounded-md mt-4"
+          className="px-4 py-2 bg-[#85716B] xs:text-sm text-xs text-white rounded disabled:opacity-50"
           onClick={handleSave}
         >
           Proceed to Bank Details
