@@ -37,52 +37,58 @@ const SignInForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
+      // First attempt to sign in
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // If sign in successful, check user status
       const usersRef = collection(db, "vendors");
       const q = query(usersRef, where("personalDetails.email", "==", email));
       const querySnapshot = await getDocs(q);
-  
+
       if (querySnapshot.empty) {
         toast.error("No vendor found with this email");
+        await auth.signOut(); // Sign out if no vendor record found
         setLoading(false);
         return;
-      }
-  
-      const userDoc = querySnapshot.docs[0];
-      const userData = userDoc.data();
-      const userEmail = userData.personalDetails?.email;
-      const status = userData.status; // Get status field
-  
-      if (!userEmail) {
-        throw new Error("Email not found in database");
       }
 
-      // Check if status is "verified"
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      const status = userData.status;
+
       if (status !== "verified") {
         toast.error("Your account is pending verification. Please wait for admin approval.");
+        await auth.signOut(); // Sign out if not verified
         setLoading(false);
         return;
       }
-  
-      await signInWithEmailAndPassword(auth, userEmail, password);
-  
+
+      // If everything is okay, dispatch user data and redirect
       dispatch(
         setUser({
           userData: {
             name: userData.personalDetails?.name || "Unknown",
-            email: userEmail,
-            status: status, // Include status in user data
+            email: userData.personalDetails?.email,
+            status: status,
           },
           userId: userDoc.id,
         })
       );
-  
+
       toast.success("Login successful");
       router.push("/dashboard");
+
     } catch (error) {
       console.error("Error signing in:", error);
-      toast.error("An error occurred during login");
+      if (error.code === 'auth/invalid-login-credentials') {
+        toast.error("Incorrect email or password. Please try again.");
+      } else if (error.code === 'auth/user-not-found') {
+        toast.error("No user found with this email.");
+      } else {
+        toast.error("Login failed. Please check your credentials.");
+      }
     } finally {
       setLoading(false);
     }

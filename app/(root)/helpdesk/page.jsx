@@ -189,7 +189,7 @@ export default function OrdersPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        setItem(data);
+        setItem(data.query); // Fix: set data.query instead of data
         setSelectedQuery(queryId);
         setSelectedQueries([queryId]);
         setSendModal(true);
@@ -224,6 +224,20 @@ export default function OrdersPage() {
     }
   };
 
+  const handleViewClose = () => {
+    setViewModal(false);
+    setSelectedQueries([]);
+    setItem({}); // Clear the item state
+  };
+  
+  const handleSendClose = () => {
+    setSendModal(false);
+    setSelectedQueries([]);
+    setItem({}); // Clear the item state
+    setReopenedMsg(''); // Clear the reopen message
+    setSelectedQuery(''); // Clear the selected query
+  };
+
   const columns = [
     { accessorKey: "id", header: "Query ID" },
     { accessorKey: "title", header: "Category" },
@@ -242,19 +256,28 @@ export default function OrdersPage() {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="rounded-full flex justify-center items-center"
-            onClick={() => handleViewClick(row.original.id)}>
-            View
-          </Button>
+          <Dialog onOpenChange={handleViewClose} open={viewModal}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="rounded-full flex justify-center items-center"
+                onClick={() => handleViewClick(row.original.id)}>
+                View
+              </Button>
+            </DialogTrigger>
+          </Dialog>
+          
           {row.original.status === "resolved" && (
-            <Button
-              variant="outline"
-              className="rounded-full flex justify-center items-center"
-              onClick={() => handleSendClick(row.original.id)}>
-              Re-Open
-            </Button>
+            <Dialog onOpenChange={handleSendClose} open={sendModal}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="rounded-full flex justify-center items-center"
+                  onClick={() => handleSendClick(row.original.id)}>
+                  Re-Open
+                </Button>
+              </DialogTrigger>
+            </Dialog>
           )}
         </div>
       )
@@ -553,167 +576,107 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {viewModal && (
-        <div
-          className="fixed z-[9999] inset-0 z-10 overflow-y-auto flex items-center justify-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-          <div
-            className="bg-white p-6 max-w-2xl rounded-xl shadow-xl w-3/4 max-h-4/5 overflow-y-auto"
-            style={{ maxHeight: "80vh" }}
-          >
-            <div className="flex justify-end pb-0">
-              <button
-                onClick={() => {
-                  setViewModal(false);
-                  setSelectedQueries([]);
-                }}
-                className="focus:outline-none"
-              >
-                <X />
-              </button>
+      <Dialog open={viewModal} onOpenChange={handleViewClose}>
+        <DialogContent className="sm:max-w-[425px] bg-white">
+          <DialogHeader>
+            <DialogTitle>Query Details</DialogTitle>
+          </DialogHeader>
+          <div>
+            <div className="flex flex-col">
+              <span className="m-2">Query Title</span>
+              <Input readOnly value={item?.title || ''} className="rounded-xl" />
             </div>
-            <div className="flex justify-center items-center text-2xl font-semibold mb-4">
-              Query Details
-            </div>
-            <div>
-              <div className="flex flex-col">
-                <span className="m-2">Query Title</span>
-                <Input readOnly value={item.title} className="rounded-xl" />
-              </div>
-              <div className="flex flex-col">
-                <span className="m-2">Query Description</span>
-                <Textarea
-                  readOnly
-                  value={item.description}
-                  className="rounded-xl"
-                />
-              </div>
-            </div>
-            {item.status === "active" ? (
-              <></>
-            ) : (
-              <div className="flex flex-col">
-                <span className="m-2">Resolved Message</span>
-                <Textarea
-                  readOnly
-                  value={item.resolveMsg}
-                  className="rounded-xl"
-                />
-              </div>
-            )}
-            {item.status === "reopened" ||
-            (item.status === "closed" && item.reopenMsg) ? (
-              <div className="flex flex-col">
-                <span className="m-2">Re-Opened Message</span>
-                <Textarea
-                  readOnly
-                  value={item.reopenMsg}
-                  className="rounded-xl"
-                />
-              </div>
-            ) : (
-              <></>
-            )}
-            {item.status === "closed" ? (
-              <div className="flex flex-col">
-                <span className="m-2">Closed Message</span>
-                <Textarea
-                  readOnly
-                  value={item.closeMsg}
-                  className="rounded-xl"
-                />
-              </div>
-            ) : (
-              <></>
-            )}
-            <div className="flex flex-row justify-end mt-10">
-              <Button
-                type="submit"
-                className="mx-2 text-white bg-baw-baw-g3"
-                onClick={() => {
-                  setViewModal(false);
-                }}
-              >
-                Cancel
-              </Button>
+            <div className="flex flex-col">
+              <span className="m-2">Query Description</span>
+              <Textarea
+                readOnly
+                value={item?.description || ''}
+                className="rounded-xl"
+              />
             </div>
           </div>
-        </div>
-      )}
-      
-      {sendModal && (
-        <div
-          className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-          <div
-            className="bg-white p-6 rounded-xl shadow-xl w-3/4 max-h-4/5 overflow-y-auto"
-            style={{ maxHeight: "80vh" }}
-          >
-            <div className="flex justify-end pb-0">
-              <button
-                onClick={() => {
-                  setSendModal(false);
-                  setSelectedQueries([]);
-                }}
-                className="focus:outline-none"
-              >
-                <X />
-              </button>
+          {item?.status === "active" ? (
+            <></>
+          ) : (
+            <div className="flex flex-col">
+              <span className="m-2">Resolved Message</span>
+              <Textarea
+                readOnly
+                value={item?.resolveMsg || ''}
+                className="rounded-xl"
+              />
             </div>
-            {/* <div className="flex justify-center items-center text-2xl font-semibold mb-4">
-                Query Details
-              </div> */}
-            <div>
-              <div className="flex flex-col">
-                <span className="m-2">Subject</span>
-                {/* <Input
-                    readOnly
-                    value={item.queryId}
-                    className="rounded-xl"
-                  /> */}
-                <div className="rounded-xl border-solid border border-gray-400 p-4">
-                  {item.queryId}: Issue Re-Opened
-                </div>
+          )}
+          {item?.status === "reopened" ||
+          (item?.status === "closed" && item?.reopenMsg) ? (
+            <div className="flex flex-col">
+              <span className="m-2">Re-Opened Message</span>
+              <Textarea
+                readOnly
+                value={item?.reopenMsg || ''}
+                className="rounded-xl"
+              />
+            </div>
+          ) : null}
+          {item?.status === "closed" ? (
+            <div className="flex flex-col">
+              <span className="m-2">Closed Message</span>
+              <Textarea
+                readOnly
+                value={item?.closeMsg || ''}
+                className="rounded-xl"
+              />
+            </div>
+          ) : null}
+          <DialogFooter>
+            <Button onClick={handleViewClose}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={sendModal} onOpenChange={handleSendClose}>
+        <DialogContent className="sm:max-w-[425px] bg-white">
+          <DialogHeader>
+            <DialogTitle>Re-Open Query</DialogTitle>
+          </DialogHeader>
+          <div>
+            <div className="flex flex-col">
+              <span className="m-2">Subject</span>
+              <div className="rounded-xl border-solid border border-gray-400 p-4">
+                {item?.queryId}: Issue Re-Opened
               </div>
+            </div>
 
-              {item.status === "closed" || item.status === "reopened" ? (
-                <div className="flex flex-col">
-                  <span className="m-2">Re-Opened Message</span>
-                  <Textarea
-                    readOnly
-                    value={item.reopenMsg}
-                    className="rounded-xl"
-                  />
-                </div>
-              ) : (
-                <></>
-              )}
-
+            {(item?.status === "closed" || item?.status === "reopened") && (
               <div className="flex flex-col">
-                <span className="m-2">Re-Opened Message</span>
+                <span className="m-2">Previous Re-Opened Message</span>
                 <Textarea
-                  value={reopenMsg}
-                  onChange={(e) => setReopenedMsg(e.target.value)}
+                  readOnly
+                  value={item?.reopenMsg || ''}
                   className="rounded-xl"
                 />
               </div>
-            </div>
-            <div className="flex flex-row justify-end mt-10">
-              <Button
-                type="submit"
-                className="mx-2 bg-baw-baw-g3 text-white"
-                onClick={() => {
-                  handleReopen();
-                }}
-              >
-                Re-Open
-              </Button>
+            )}
+
+            <div className="flex flex-col">
+              <span className="m-2">Re-Open Message</span>
+              <Textarea
+                value={reopenMsg}
+                onChange={(e) => setReopenedMsg(e.target.value)}
+                className="rounded-xl"
+              />
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button onClick={handleReopen} className="bg-baw-baw-g3 text-white">
+              Re-Open
+            </Button>
+            <Button variant="outline" onClick={handleSendClose}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -55,7 +55,7 @@ const EmptyState = ({ onAddClick, activeTab }) => (
           You havent created any coupons yet. Start by creating your first coupon to attract more customers.
         </p>
         <Button 
-          className="bg-[#B29581] hover:bg-[#a0846f] text-white"
+          className="bg-[#B29581] text-white border-[#F3EAE7]"
           onClick={onAddClick}
         >
           Create Your First Coupon
@@ -95,10 +95,10 @@ const CouponTable = ({ data, columns, onToggleStatus, onAddClick, activeTab }) =
       </div>
 
       <div className="bg-white rounded-lg shadow-md mt-4">
-        <Table className="border-none">
-          <TableHeader className="min-w-10 bg-[#F3EAE7]">
+        <Table className="border-none overflow-hidden rounded-t-lg">
+          <TableHeader className="min-w-10 bg-[#F3EAE7] rounded-t-lg">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-gray-50 bg-[#F3EAE7]">
+              <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-gray-50 bg-[#F3EAE7] rounded-t-lg">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} className="py-3 font-semibold">
                     {header.isPlaceholder
@@ -119,28 +119,28 @@ const CouponTable = ({ data, columns, onToggleStatus, onAddClick, activeTab }) =
                 const bgColor = index % 2 === 0 ? "bg-white" : "bg-[#F3EAE7]";
                 return (
                   <TableRow 
-                    key={row.id} 
-                    className={`${bgColor} my-1 shadow-sm border-none overflow-hidden rounded-xl`}
+                  key={row.id} 
+                  className={`${bgColor} my-1 shadow-sm border-none overflow-hidden rounded-xl`}
                   >
-                    {row.getVisibleCells().map((cell, cellIndex) => (
-                      <TableCell 
-                        key={cell.id} 
-                        className={`px-3 py-1 ${cellIndex === 0 ? 'rounded-s-xl' : ''}`}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                    <TableCell className="px-3 py-2 rounded-e-xl">
-                      <Button
-                        onClick={() => onToggleStatus(row.original.id, row.original.status)}
-                        className="bg-red-500 text-white"
-                      >
-                        {row.original.status === "Active" ? "Disable" : "Active"}
-                      </Button>
+                  {row.getVisibleCells().map((cell, cellIndex) => (
+                    <TableCell 
+                    key={cell.id} 
+                    className={`px-3 py-1 ${cellIndex === 0 ? 'rounded-s-xl' : ''}`}
+                    >
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
                     </TableCell>
+                  ))}
+                  <TableCell className="px-3 py-2 rounded-e-xl">
+                    <Button
+                    onClick={() => onToggleStatus(row.original.id, row.original.status)}
+                    className="bg-white text-black border border-[#F3EAE7] rounded-full"
+                    >
+                    {row.original.status === "Active" ? "Disable" : "Active"}
+                    </Button>
+                  </TableCell>
                   </TableRow>
                 );
               })
