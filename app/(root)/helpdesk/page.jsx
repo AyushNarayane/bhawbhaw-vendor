@@ -246,9 +246,11 @@ export default function OrdersPage() {
       accessorKey: "status", 
       header: "Status",
       cell: ({ row }) => (
-        <div className="pt-5 text-red-400 flex items-center gap-1">
-          <p className="h-2 w-2 bg-red-500 rounded-full"></p>{" "}
+        <div className="pt-5 text-red-400 flex items-center gap-1 ">
+          <p className="h-2 w-2 bg-red-500 rounded-full mb-4"></p>{" "}
+          <div className=" mb-4">
           {row.original.status}
+        </div>
         </div>
       )
     },
@@ -454,12 +456,10 @@ export default function OrdersPage() {
                     });
                     setData(sorted);
                     }}>
-                    Oldest First
+                      Oldest First
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  {/* Search Input */}
+                </DropdownMenu>
           <div className="flex items-center">
             <Input
               placeholder="Search by Query ID"
