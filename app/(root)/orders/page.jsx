@@ -116,9 +116,15 @@ const OrderTable = ({ data, columns, onView, onChangeStatus }) => {
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+              <TableRow 
+                key={headerGroup.id} 
+                className="border-b transition-colors bg-[#F3EAE7]"
+              >
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
+                  <TableHead 
+                    key={header.id} 
+                    className="h-10 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -127,27 +133,31 @@ const OrderTable = ({ data, columns, onView, onChangeStatus }) => {
                         )}
                   </TableHead>
                 ))}
-                <TableHead className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</TableHead>
+                <TableHead className="h-10 px-4 text-left align-middle font-medium text-muted-foreground">
+                  Actions
+                </TableHead>
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                  className={`border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-[#F3EAE7]'
+                  }`}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="p-4">
+                    <TableCell key={cell.id} className="p-2 h-10">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
                       )}
                     </TableCell>
                   ))}
-                  <TableCell className="p-4">
+                  <TableCell className="p-2 h-10">
                     <div className="flex gap-4 justify-center">
                       <Button
                         variant="outline"
@@ -196,8 +206,7 @@ const OrderTable = ({ data, columns, onView, onChangeStatus }) => {
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          
         </div>
         <div className="space-x-2">
           <Button
@@ -434,8 +443,8 @@ const OrdersPage = () => {
         accessorFn: (row) => row.products[0]?.title || "N/A",
       },
       {
-        header: "category",
-        accessorFn: (row) => row.products[0]?.category || "N/A",
+        header: "Category",
+        accessorFn: (row) => row.items[0]?.category || "N/A", // Changed from products to items
       },
       {
         header: "Quantity",
@@ -443,7 +452,7 @@ const OrdersPage = () => {
       },
       {
         header: "Selling Price",
-        accessorFn: (row) => row.products[0]?.sellingPrice || "N/A",
+        accessorFn: (row) => row.items[0]?.sellingPrice || "N/A", // Changed from products to items
       },
       {
         header: "Shipping Address",
