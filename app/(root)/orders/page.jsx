@@ -41,6 +41,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import Image from "next/image";
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const OrderTable = ({ data, columns, onView, onChangeStatus }) => {
   const [search, setSearch] = useState("orderId");
@@ -235,7 +237,7 @@ const OrdersPage = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  useEffect(()=>{
+  useEffect(()=>{ 
     if(currentUser){
       setVendorId(currentUser.id)
       fetchOrders(currentUser.id);
@@ -270,16 +272,75 @@ const OrdersPage = () => {
     "Rejected": "rejected",
   };
 
-  const fetchOrders = async (vendorId) => {
+  const fetchOrders = async () => {
     try {
-      const response = await fetch(`/api/orders/getOrdersByVendorId?vendorId=${vendorId}`);
-      const data = await response.json();
-      setAllOrders(data.orders || []);
-      setOrders(data.orders || []);
+      console.log("Fetching all orders"); // Debug log
+      const ordersRef = collection(db, 'orders');
+      
+      // Remove the vendorId filter to get all orders
+      const querySnapshot = await getDocs(ordersRef);
+      console.log("Number of orders found:", querySnapshot.size); // Debug log
+      
+      const ordersData = [];
+      
+      for (const docSnapshot of querySnapshot.docs) {
+        const orderData = docSnapshot.data();
+        console.log("Raw order data:", orderData); // Debug log
+        
+        const products = orderData.products || [];
+        const productsWithDetails = [];
+        
+        for (const product of products) {
+          try {
+            if (product.productId) {
+              const productRef = doc(db, 'products', product.productId);
+              const productSnap = await getDoc(productRef);
+              
+              if (productSnap.exists()) {
+                const productData = productSnap.data();
+                productsWithDetails.push({
+                  ...product,
+                  title: productData.title || 'N/A',
+                  category: productData.category || 'N/A',
+                  description: productData.description || '',
+                  images: productData.images || []
+                });
+              } else {
+                productsWithDetails.push({
+                  ...product,
+                  title: 'Product Not Found',
+                  category: 'N/A'
+                });
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching product details:", error);
+            productsWithDetails.push({
+              ...product,
+              title: 'Error Loading Product',
+              category: 'N/A'
+            });
+          }
+        }
+        
+        ordersData.push({
+          ...orderData,
+          orderId: docSnapshot.id,
+          products: productsWithDetails
+        });
+      }
+      
+      console.log("Processed orders data:", ordersData); // Debug log
+      setAllOrders(ordersData);
+      setOrders(ordersData);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []); // Remove currentUser dependency
 
   useEffect(() => {
     let filtered = [...allOrders];
@@ -332,20 +393,28 @@ const OrdersPage = () => {
     currentPage * ordersPerPage
   );
 
+  // Add this function to refresh orders after status update
+  const refreshOrders = () => {
+    if (currentUser?.id) {
+      fetchOrders(currentUser.id);
+    }
+  };
+
+  // Modify handleChangeStatus to refresh orders after update
   const handleChangeStatus = async (newStatus) => {
     if (!selectedOrder) return;
     try {
       const response = await fetch("/api/orders/updateOrder", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: selectedOrder.orderId, data: { status: newStatus } }),
+        body: JSON.stringify({ 
+          orderId: selectedOrder.orderId, 
+          data: { status: newStatus } 
+        }),
       });
+      
       if (response.ok) {
-        setAllOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order.orderId === selectedOrder.orderId ? { ...order, status: newStatus } : order
-          )
-        );
+        refreshOrders(); // Refresh orders after successful update
         setModalOpen(false);
       }
     } catch (error) {
@@ -365,7 +434,7 @@ const OrdersPage = () => {
         accessorFn: (row) => row.products[0]?.title || "N/A",
       },
       {
-        header: "Category",
+        header: "category",
         accessorFn: (row) => row.products[0]?.category || "N/A",
       },
       {
