@@ -58,7 +58,7 @@ const SignInForm = () => {
       const userData = userDoc.data();
       const status = userData.status;
 
-      if (status !== "verified") {
+      if (!status == "verified") {
         toast.error("Your account is pending verification. Please wait for admin approval.");
         await auth.signOut(); // Sign out if not verified
         setLoading(false);

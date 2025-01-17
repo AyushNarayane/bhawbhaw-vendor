@@ -69,14 +69,17 @@ const MultiStepForm = () => {
     }
 
     try {
-      // Create user with email and password
+      // Create user auth only
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.personalDetails.email,
-        formData.personalDetails.password // Make sure password is collected in PersonalDetails
+        formData.personalDetails.password
       );
 
       const user = userCredential.user;
+      
+      // Sign out immediately after creation
+      await auth.signOut();
       
       // Create vendor document in Firestore
       const vendorDocRef = doc(db, 'vendors', userId);
@@ -90,32 +93,12 @@ const MultiStepForm = () => {
         createdAt: serverTimestamp()
       });
 
-      const response = await fetch('/api/auth/addAdditionalDetails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          personalDetails: formData.personalDetails,
-          businessDetails: formData.businessDetails,
-          bankDetails: formData.bankDetails,
-          documents: formData.documentUpload,
-          userId: userId,
-          uid: user.uid
-        }),
-      });
-       
-      if (!response.ok) {
-        throw new Error('Failed to submit data');
-      }
-      
+      // Show success dialog
       setShowSuccessDialog(true);
-      toast.success('Account created successfully!');
-      
+      toast.success('Account created successfully! Please sign in.');
+
     } catch (error) {
       console.error('Error submitting data:', error);
-      
-      // Handle specific Firebase auth errors
       const errorMessage = {
         'auth/email-already-in-use': 'This email is already registered',
         'auth/invalid-email': 'Invalid email address',

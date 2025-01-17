@@ -88,56 +88,9 @@ const ProductTable = ({ data, columns, onEdit }) => {
       ) : (
         <>
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-            <div className="w-full md:w-auto">
-              <Input
-                placeholder="Search by search type..."
-                value={table.getColumn(search)?.getFilterValue() || ""}
-                onChange={(event) =>
-                  table.getColumn(search)?.setFilterValue(event.target.value)
-                }
-                className="w-full md:w-[300px] focus:outline-none rounded-lg bg-[#F3EAE7] text-[#85716B]"
-              />
-            </div>
-            <Select
-              onValueChange={(e) => {
-                setSearch(e);
-              }}
-            >
-              <SelectTrigger className="bg-white border focus:ring-0 text-black ring-offset-0 focus:ring-offset-0 capitalize outline-none w-1/4">
-                <SelectValue placeholder="Select a search type" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                {searchTitles.map((mt) => (
-                  <SelectItem key={mt} value={mt} className="capitalize hover:bg-gray-100">
-                    {mt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto bg-white">
-                  Columns <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white">
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize hover:bg-gray-100"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+          
+           
+          
           </div>
 
           <div className="rounded-lg shadow-md">
@@ -205,10 +158,7 @@ const ProductTable = ({ data, columns, onEdit }) => {
           </div>
 
           <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-[#85716B]">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div>
+            
             <div className="space-x-2">
               <Button
                 variant="outline"
@@ -236,7 +186,7 @@ const ProductTable = ({ data, columns, onEdit }) => {
   );
 };
 
-const ProductPage = () => {
+export default function ProductPage() {
   const [activeTab, setActiveTab] = useState("bulk");
   const [activeSection, setActiveSection] = useState("My Products"); // Changed default
   const [showProducts, setShowProducts] = useState("My Products"); // Changed default
@@ -701,45 +651,61 @@ const handleFileUpload = (event) => {
               if (showProducts === "My Products") {
                 setShowProducts("Add Product");
                 setActiveSection("Add Product");
-                setModalOpen(true);
               } else {
                 setShowProducts("My Products");
                 setActiveSection("My Products");
-                setModalOpen(false);
               }
             }}
           >
             {showProducts === "My Products" ? "Add Product" : "My Products"}
           </Button>
-          <div className="flex space-x-2 items-center">
-            <Input 
-              type="text" 
-              placeholder="Search" 
-              className="w-64 rounded-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Button className="px-3 py-2" variant="outline">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
+              {showProducts === "My Products" && (
+              <div className="flex space-x-2 items-center">
+                <Input 
+                type="text" 
+                placeholder="Search" 
+                className="w-64 rounded-lg"
+                value={searchTerm}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchTerm(value);
+                  // Filter products based on search term and current product status
+                  const filtered = products.filter((product) => 
+                  product.title.toLowerCase().includes(value.toLowerCase()) &&
+                  product.status === productStatus
+                  );
+                  setFilteredProducts(filtered);
+                }}
+                />
+                <Button 
+                className="px-3 py-2" 
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm('');
+                  setFilteredProducts(products.filter(p => p.status === productStatus));
+                }}
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
                   d="M4 4v5h.582a9.977 9.977 0 00-2.614 6.319A10.014 10.014 0 1012 2.05V7h4"
-                />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </div>
+                  />
+                </svg>
+                </Button>
+              </div>
+              )}
+            </div>
+            </div>
 
-      {/* Rest of the component */}
+            {/* Rest of the component */}
       {showProducts === "My Products" ? (
         <>
           <div className="flex space-x-4 mb-6">
@@ -860,6 +826,7 @@ const handleFileUpload = (event) => {
 
         </>
       )}
+
       {modalOpen && (
       <Dialog open={modalOpen} onOpenChange={() => setModalOpen(false)}>
         <DialogContent className="max-w-[70rem] p-6 bg-white rounded-lg shadow-lg">
@@ -1142,5 +1109,3 @@ const handleFileUpload = (event) => {
     </div>
   );
 };
-
-export default ProductPage;

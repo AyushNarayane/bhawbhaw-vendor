@@ -290,6 +290,14 @@ export default function OrdersPage() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    state: {
+      globalFilter: searchQuery,
+    },
+    onGlobalFilterChange: setSearchQuery,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const id = row.original.id.toLowerCase();
+      return id.includes(filterValue.toLowerCase());
+    },
   });
 
   const searchTitles = ["id", "title", "status", "createdAt"];
@@ -410,58 +418,51 @@ export default function OrdersPage() {
                         setDescription("");
                         setOpenDialogue(false);
                         setIsQueryAdded(false);
-                      }}
-                      variant="outline"
-                    >
-                      Close
+                        }}
+                        variant="outline"
+                      >
+                        Close
+                      </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                    </Dialog>
+                  </div>
+                  </div>
+                  <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="mr-4 flex items-center">
+                    Sort by Date
+                    <FiChevronDown className="ml-2" />
                     </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="mr-4 flex items-center">
-                Sort
-                <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
-              <DropdownMenuItem onSelect={() => setSortOption("Ascending")}>
-                Ascending
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setSortOption("Descending")}>
-                Descending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-white">
+                    <DropdownMenuItem onSelect={() => {
+                    const sorted = [...data].sort((a, b) => {
+                      const dateA = new Date(a.createdAt);
+                      const dateB = new Date(b.createdAt);
+                      return dateB - dateA; // For newest first
+                    });
+                    setData(sorted);
+                    }}>
+                    Newest First
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => {
+                    const sorted = [...data].sort((a, b) => {
+                      const dateA = new Date(a.createdAt);
+                      const dateB = new Date(b.createdAt);
+                      return dateA - dateB; // For oldest first
+                    });
+                    setData(sorted);
+                    }}>
+                    Oldest First
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                  </DropdownMenu>
 
-          {/* Filter Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="mr-4 flex items-center">
-                Filter
-                <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
-              <DropdownMenuItem onSelect={() => setFilterOption("All")}>
-                All
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setFilterOption("Completed")}>
-                Completed
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setFilterOption("Pending")}>
-                Pending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Search Input */}
+                  {/* Search Input */}
           <div className="flex items-center">
             <Input
-              placeholder="Search"
+              placeholder="Search by Query ID"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="mr-4"
@@ -552,8 +553,7 @@ export default function OrdersPage() {
 
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+           
           </div>
           <div className="space-x-2">
             <Button

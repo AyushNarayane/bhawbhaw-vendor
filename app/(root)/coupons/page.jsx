@@ -426,65 +426,77 @@ const CouponsPage = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          {/* Sort Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="mr-4 flex items-center">
-                Sort
-                <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
-              <DropdownMenuItem onSelect={() => setSortOption("Ascending")}>
-                Ascending
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setSortOption("Descending")}>
-                Descending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+       
+                <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="mr-4 flex items-center">
+                  Sort by Date
+                  <FiChevronDown className="ml-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white">
+                  <DropdownMenuItem 
+                  onSelect={() => {
+                    const sorted = [...filteredCoupons].sort((a, b) => {
+                    const dateA = new Date(a.createdAt?.seconds * 1000 || a.createdAt);
+                    const dateB = new Date(b.createdAt?.seconds * 1000 || b.createdAt);
+                    return dateB - dateA;
+                    });
+                    setFilteredCoupons(sorted);
+                  }}
+                  >
+                  Newest First
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                  onSelect={() => {
+                    const sorted = [...filteredCoupons].sort((a, b) => {
+                    const dateA = new Date(a.createdAt?.seconds * 1000 || a.createdAt);
+                    const dateB = new Date(b.createdAt?.seconds * 1000 || b.createdAt);
+                    return dateA - dateB;
+                    });
+                    setFilteredCoupons(sorted);
+                  }}
+                  >
+                  Oldest First
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+                </DropdownMenu>
 
-          {/* Filter Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="mr-4 flex items-center">
-                Filter
-                <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
-              <DropdownMenuItem onSelect={() => setFilterOption("All")}>
-                All
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setFilterOption("Completed")}>
-                Completed
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setFilterOption("Pending")}>
-                Pending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {/* Filter Dropdown */}
+         
 
           {/* Search Input */}
           <div className="flex items-center">
-            <Input
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="mr-4"
-            />
-            <Button variant="outline" onClick={fetchCoupons}>
-              {refresh ? (
-                  <ClipLoader size={17} color={"#000"} loading={refresh} />
-              ) : (
-                  <IoMdRefresh className="text-xl" />
-              )}
-            </Button>
-          </div>
-        </div>
-      </div>
+                <Input
+                  placeholder="Search coupons..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  const query = e.target.value.toLowerCase();
+                  const filtered = coupons.filter(coupon => 
+                    coupon.status === activeTab && (
+                    coupon.couponTitle.toLowerCase().includes(query) ||
+                    coupon.id.toLowerCase().includes(query) ||
+                    coupon.discount.toString().includes(query) ||
+                    coupon.minPrice.toString().includes(query)
+                    )
+                  );
+                  setFilteredCoupons(filtered);
+                  }}
+                  className="mr-4"
+                />
+                <Button variant="outline" onClick={fetchCoupons}>
+                  {refresh ? (
+                    <ClipLoader size={17} color={"#000"} loading={refresh} />
+                  ) : (
+                    <IoMdRefresh className="text-xl" />
+                  )}
+                </Button>
+                </div>
+              </div>
+              </div>
 
-      {/* Tab buttons */}
+              {/* Tab buttons */}
       <div className="">
         {tabs.map((tab) => (
           <Button

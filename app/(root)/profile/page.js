@@ -26,27 +26,48 @@ const InfoRow = ({ icon, label, value }) => (
 export default function ProfilePage() {
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState(null);
+  const [bankName, setBankName] = useState('');
+
+  const fetchBankName = async (ifscCode) => {
+    try {
+      const response = await fetch(`https://ifsc.razorpay.com/${ifscCode}`);
+      const data = await response.json();
+      return data.BANK;
+    } catch (error) {
+      console.error('Error fetching bank name:', error);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    if (currentUser) {
-      console.log('Current User Data:', currentUser); // For debugging
-      setUserData({
-        name: currentUser.personalDetails?.name || '',
-        email: currentUser.personalDetails?.email || '',
-        brandName: currentUser.businessDetails?.brandName || '',
-        businessName: currentUser.businessDetails?.businessName || '',
-        subscription: currentUser.businessDetails?.subscription || '',
-        id: currentUser?.id || '',
-        bankName: currentUser.bankDetails?.bankName || currentUser.bankingDetails?.bankName || '',
-        accountNumber: currentUser.bankDetails?.accountNumber || currentUser.bankingDetails?.accountNumber || '',
-        ifscCode: currentUser.bankDetails?.ifsc || currentUser.bankingDetails?.ifsc || '',
-        accountHolderName: currentUser.bankDetails?.holderName || currentUser.bankingDetails?.holderName || '',
-        categories: currentUser.businessDetails?.categories || [],
-        gst: currentUser.businessDetails?.gstNumber || currentUser.taxDetails?.gst || '',
-        pan: currentUser.businessDetails?.panNumber || currentUser.taxDetails?.pan || '',
+    const initializeData = async () => {
+      if (currentUser) {
+        const ifscCode = currentUser.bankDetails?.ifsc || currentUser.bankingDetails?.ifsc;
+        let bankNameFromIfsc = '';
+        
+        if (ifscCode) {
+          bankNameFromIfsc = await fetchBankName(ifscCode);
+        }
 
-      });
-    }
+        setUserData({
+          name: currentUser.personalDetails?.name || '',
+          email: currentUser.personalDetails?.email || '',
+          brandName: currentUser.businessDetails?.brandName || '',
+          businessName: currentUser.businessDetails?.businessName || '',
+          subscription: currentUser.businessDetails?.subscription || '',
+          id: currentUser?.id || '',
+          bankName: bankNameFromIfsc || 'Not available',
+          accountNumber: currentUser.bankDetails?.accountNumber || currentUser.bankingDetails?.accountNumber || '',
+          ifscCode: currentUser.bankDetails?.ifsc || currentUser.bankingDetails?.ifsc || '',
+          accountHolderName: currentUser.bankDetails?.holderName || currentUser.bankingDetails?.holderName || '',
+          categories: currentUser.businessDetails?.categories || [],
+          gst: currentUser.businessDetails?.gstNumber || currentUser.taxDetails?.gst || '',
+          pan: currentUser.businessDetails?.panNumber || currentUser.taxDetails?.pan || '',
+        });
+      }
+    };
+
+    initializeData();
   }, [currentUser]);
 
   if (!userData) return <div>Loading...</div>;
@@ -138,7 +159,7 @@ export default function ProfilePage() {
                 <InfoRow
                   icon={<FiDollarSign />}
                   label="Bank Name"
-                  value={userData?.ifscCode ? userData.ifscCode.slice(0, 4) : 'Not provided'}
+                  value={userData?.bankName}
                 />
                 <InfoRow
                   icon={<FiDollarSign />}

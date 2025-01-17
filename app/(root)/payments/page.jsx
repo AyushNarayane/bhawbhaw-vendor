@@ -106,51 +106,35 @@ export default function OrdersPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="mr-4 flex items-center">
                 Filter
-                <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
-              <DropdownMenuItem onSelect={() => setFilterOption("All")}>
-                All
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setFilterOption("Completed")}>
-                Completed
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setFilterOption("Pending")}>
-                Pending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+               { /* Arrow Icon */}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-white">
+                        <DropdownMenuItem onSelect={() => setFilterOption("All")}>
+                        All
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setFilterOption("Completed")}>
+                        Completed
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setFilterOption("Pending")}>
+                        Pending
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                      </DropdownMenu>
 
-          {/* Search Input */}
-          <div className="flex items-center">
-            <Input
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="mr-4"
-            />
-            <Button variant="outline">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 4v5h.582a9.977 9.977 0 00-2.614 6.319A10.014 10.014 0 1012 2.05V7h4"
-                />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </div>
+                      {/* Search Input */}
+                      <div className="flex items-center">
+                      <Input
+                        placeholder="Search by Booking ID"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="mr-4"
+                      />
+                      </div>
+                    </div>
+                    </div>
 
-      {/* Status Tabs */}
+                    {/* Status Tabs */}
       <div className="flex flex-wrap mb-6 overflow-x-auto">
         {tabs.map((tab) => (
           <Button
@@ -167,30 +151,43 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders Table */}
-
-      <div className="mt-8 bg-white px-6 pb-6 rounded-lg shadow-md">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b-2 border-[#C9ABA0]">
-              <TableHead className="text-[#C9ABA0] py-6">Booking ID</TableHead>
-              <TableHead className="text-[#C9ABA0]">Status</TableHead>
-              <TableHead className="text-[#C9ABA0]">Amount</TableHead>
-              <TableHead className="text-[#C9ABA0]">Date</TableHead>
+      <div className="bg-[#F3EAE7] rounded-lg shadow-md mt-4">
+        <Table className="border-none">
+          <TableHeader className="min-w-10">
+            <TableRow className="border-b transition-colors hover:bg-muted/50">
+              <TableHead className="py-4 font-semibold">Booking ID</TableHead>
+              <TableHead className="py-4 font-semibold">Status</TableHead>
+              <TableHead className="py-4 font-semibold">Amount</TableHead>
+              <TableHead className="py-4 font-semibold">Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentOrders.map((payment, index) => (
-              <TableRow key={`${payment.bookingId}-${index}`} className="border-none">
-                <TableCell className="pt-5">{payment.bookingId}</TableCell>
-                <TableCell className="pt-5">
+              <TableRow 
+                key={`${payment.bookingId}-${index}`} 
+                className="my-2 shadow-sm border-none overflow-hidden rounded-xl bg-transparent"
+              >
+                {[
+                  payment.bookingId,
                   <span className={`px-2 py-1 rounded ${
                     payment.status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
                   }`}>
                     {payment.status}
-                  </span>
-                </TableCell>
-                <TableCell className="pt-5">{payment.amount}</TableCell>
-                <TableCell className="pt-5">{payment.date}</TableCell>
+                  </span>,
+                  payment.amount,
+                  payment.date
+                ].map((cell, cellIndex) => (
+                  <TableCell 
+                    key={cellIndex}
+                    className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#F3EAE7]'} px-4 py-4 ${
+                      cellIndex === 0 ? 'rounded-s-xl' : ''
+                    } ${
+                      cellIndex === 3 ? 'rounded-e-xl' : ''
+                    }`}
+                  >
+                    {cell}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>
