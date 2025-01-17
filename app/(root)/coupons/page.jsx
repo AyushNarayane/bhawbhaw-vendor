@@ -428,10 +428,11 @@ const CouponsPage = () => {
           </Dialog>
        
                 <DropdownMenu>
+
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="mr-4 flex items-center">
                   Sort by Date
-                  <FiChevronDown className="ml-2" />
+                  <FiChevronDown className="ml-2"  />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white">

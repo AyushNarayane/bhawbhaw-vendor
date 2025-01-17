@@ -13,6 +13,7 @@ export default async function handler(req, res) {
           name: personalDetails.name,
           email: personalDetails.email,
           phoneNumber: personalDetails.phoneNumber,
+          
         },
         status: 'initiated',
         createdAt: serverTimestamp(),
