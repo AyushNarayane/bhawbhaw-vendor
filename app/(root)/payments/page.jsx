@@ -168,24 +168,27 @@ export default function OrdersPage() {
                 className="my-2 shadow-sm border-none overflow-hidden rounded-xl bg-transparent"
               >
                 {[
-                  payment.bookingId,
-                  <span className={`px-2 py-1 rounded ${
-                    payment.status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                  }`}>
-                    {payment.status}
-                  </span>,
-                  payment.amount,
-                  payment.date
-                ].map((cell, cellIndex) => (
+                  { content: payment.bookingId, key: 'bookingId' },
+                  { 
+                    content: <span className={`px-2 py-1 rounded ${
+                      payment.status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                    }`}>
+                      {payment.status}
+                    </span>,
+                    key: 'status'
+                  },
+                  { content: payment.amount, key: 'amount' },
+                  { content: payment.date, key: 'date' }
+                ].map(({ content, key }) => (
                   <TableCell 
-                    key={cellIndex}
+                    key={`${payment.bookingId}-${key}`}
                     className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#F3EAE7]'} px-4 py-4 ${
-                      cellIndex === 0 ? 'rounded-s-xl' : ''
+                      key === 'bookingId' ? 'rounded-s-xl' : ''
                     } ${
-                      cellIndex === 3 ? 'rounded-e-xl' : ''
+                      key === 'date' ? 'rounded-e-xl' : ''
                     }`}
                   >
-                    {cell}
+                    {content}
                   </TableCell>
                 ))}
               </TableRow>
