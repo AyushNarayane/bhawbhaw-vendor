@@ -86,6 +86,7 @@ export default function OrdersPage() {
           {/* Sort Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
+
               <Button variant="outline" className="mr-4 flex items-center">
                 Sort
                 <FiChevronDown className="ml-2" /> {/* Arrow Icon */}
@@ -168,24 +169,27 @@ export default function OrdersPage() {
                 className="my-2 shadow-sm border-none overflow-hidden rounded-xl bg-transparent"
               >
                 {[
-                  payment.bookingId,
-                  <span className={`px-2 py-1 rounded ${
-                    payment.status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                  }`}>
-                    {payment.status}
-                  </span>,
-                  payment.amount,
-                  payment.date
+                  { id: 'bookingId', content: payment.bookingId },
+                  { 
+                    id: 'status',
+                    content: <span className={`px-2 py-1 rounded ${
+                      payment.status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                    }`}>
+                      {payment.status}
+                    </span>
+                  },
+                  { id: 'amount', content: payment.amount },
+                  { id: 'date', content: payment.date }
                 ].map((cell, cellIndex) => (
                   <TableCell 
-                    key={cellIndex}
+                    key={`${payment.bookingId}-${cell.id}`}
                     className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#F3EAE7]'} px-4 py-4 ${
                       cellIndex === 0 ? 'rounded-s-xl' : ''
                     } ${
                       cellIndex === 3 ? 'rounded-e-xl' : ''
                     }`}
                   >
-                    {cell}
+                    {cell.content}
                   </TableCell>
                 ))}
               </TableRow>
