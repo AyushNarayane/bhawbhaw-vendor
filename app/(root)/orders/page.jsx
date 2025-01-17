@@ -440,7 +440,7 @@ const OrdersPage = () => {
     () => [
       {
         header: "Product Title",
-        accessorFn: (row) => row.products[0]?.title || "N/A",
+        accessorFn: (row) => row.items[0]?.title || "N/A",
       },
       {
         header: "Category",
@@ -448,7 +448,7 @@ const OrdersPage = () => {
       },
       {
         header: "Quantity",
-        accessorFn: (row) => row.products[0]?.quantity || "N/A",
+        accessorFn: (row) => row.items[0]?.quantity || "N/A",
       },
       {
         header: "Selling Price",
