@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "../../../firebase";
+import { db } from "@/firebase";
 
 export async function GET(request) {
   try {
