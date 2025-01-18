@@ -241,6 +241,7 @@ const AddServicePage = () => {
     availability: "",
     expectedSalary: "",
   });
+  const [providerStatus, setProviderStatus] = useState(null);
 
   const fetchServices = async () => {
     try {
@@ -260,6 +261,24 @@ const AddServicePage = () => {
     if (currentUser?.id) {
       fetchServices();
     }
+  }, [currentUser]);
+
+  useEffect(() => {
+    const fetchProviderStatus = async () => {
+      if (currentUser?.id) {
+        try {
+          const response = await fetch(`/api/serviceprovider/status?vendorId=${currentUser.id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setProviderStatus(data.status);
+          }
+        } catch (error) {
+          console.error("Error fetching provider status:", error);
+          setProviderStatus('Not Registered');
+        }
+      }
+    };
+    fetchProviderStatus();
   }, [currentUser]);
 
   const handleChange = (e) => {
@@ -474,37 +493,49 @@ const AddServicePage = () => {
 
   return (
     <div className="p-6">
-<div className="flex justify-between items-center w-full">
-  <h1 className="text-4xl font-bold text-[#3f3f3f]">Services</h1>
-  <div className="flex space-x-4">
-    <Button
-      variant="primary"
-      className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
-      onClick={() => {
-        setIsDialogOpen(true);
-        setIsEditMode(false);
-        setServiceData({
-          address: "",
-          phoneNumber: "",
-          pricePerHour: "",
-          serviceName: "",
-          title: "",
-          image: null,
-        });
-        setImagePreview(null);
-      }}
-    >
-      Add New Service
-    </Button>
-    <Button
-      variant="secondary"
-      className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
-      onClick={() => setIsProviderDialogOpen(true)}
-    >
-      Register as Service Provider
-    </Button>
-  </div>
-</div>
+      <div className="flex justify-between items-center w-full">
+        <div className="flex items-center gap-2">
+          <h1 className="text-4xl font-bold text-[#3f3f3f]">Services</h1>
+          <span className="text-gray-400 text-2xl">•</span>
+          <span className={`px-3 py-1 rounded-full text-sm ${
+            providerStatus === 'verified' ? 'bg-green-100 text-green-800' :
+            providerStatus === 'unverified' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-red-100 text-red-800'
+          }`}>
+            {providerStatus === 'verified' ? 'Verified Provider' :
+             providerStatus === 'unverified' ? 'Pending Verification' :
+             'Not Registered'}
+          </span>
+        </div>
+        <div className="flex space-x-4">
+          <Button
+            variant="primary"
+            className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
+            onClick={() => {
+              setIsDialogOpen(true);
+              setIsEditMode(false);
+              setServiceData({
+                address: "",
+                phoneNumber: "",
+                pricePerHour: "",
+                serviceName: "",
+                title: "",
+                image: null,
+              });
+              setImagePreview(null);
+            }}
+          >
+            Add New Service
+          </Button>
+          <Button
+            variant="secondary"
+            className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
+            onClick={() => setIsProviderDialogOpen(true)}
+          >
+            Register as Service Provider
+          </Button>
+        </div>
+      </div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-white">
           <DialogHeader>
