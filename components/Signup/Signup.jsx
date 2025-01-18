@@ -19,12 +19,12 @@ const MultiStepForm = () => {
   const [visitedSteps, setVisitedSteps] = useState([]);
   const [userId, setUserId] = useState('');
   const [formData, setFormData] = useState({
-    personalDetails: { 
+    personalDetails: {
       name: '',
       email: '',
       phoneNumber: '',
       isEcommerce: false,
-      isService: false,  
+      isService: false,
     },
     businessDetails: {},
     bankDetails: {},
@@ -41,11 +41,11 @@ const MultiStepForm = () => {
     if (!visitedSteps.includes(step)) {
       setVisitedSteps([...visitedSteps, step]);
     }
-    setIsLoading(true); 
+    setIsLoading(true);
     setTimeout(() => {
       setStep(step + 1);
-      setIsLoading(false); 
-    }, 500); 
+      setIsLoading(false);
+    }, 500);
   };
 
   const prevStep = () => {
@@ -57,11 +57,11 @@ const MultiStepForm = () => {
   };
 
   const handleFinalSubmit = async () => {
-    const isFormDataComplete = 
-    formData.personalDetails && Object.keys(formData.personalDetails).length > 0 &&
-    formData.businessDetails && Object.keys(formData.businessDetails).length > 0 &&
-    formData.bankDetails && Object.keys(formData.bankDetails).length > 0 &&
-    formData.documentUpload && Object.keys(formData.documentUpload).length > 0;
+    const isFormDataComplete =
+      formData.personalDetails && Object.keys(formData.personalDetails).length > 0 &&
+      formData.businessDetails && Object.keys(formData.businessDetails).length > 0 &&
+      formData.bankDetails && Object.keys(formData.bankDetails).length > 0 &&
+      formData.documentUpload && Object.keys(formData.documentUpload).length > 0;
 
     if (!isFormDataComplete) {
       toast.error('Please fill all required information');
@@ -77,10 +77,10 @@ const MultiStepForm = () => {
       );
 
       const user = userCredential.user;
-      
+
       // Sign out immediately after creation
       await auth.signOut();
-      
+
       // Create vendor document in Firestore
       const vendorDocRef = doc(db, 'vendors', userId);
       await setDoc(vendorDocRef, {
@@ -140,7 +140,7 @@ const MultiStepForm = () => {
         icon: <AiOutlineDown className="text-black" />,
         borderColor: 'border-black',
         textColor: 'text-black',
-        bgColor: '', 
+        bgColor: '',
       };
     } else {
       return {
@@ -190,7 +190,7 @@ const MultiStepForm = () => {
       <div className="flex lg:mx-32 sm:mx-10 xs:mx-5 mx-1 flex-col items-center justify-center font-montserrat">
         <div className="w-full bg-white sm:p-8 xs:p-5 p-2 rounded-lg">
           <h2 className="text-2xl font-medium mb-10 text-center">Bhaw Bhaw Seller Registration</h2>
-          
+
           <div className="flex items-center mb-8">
             {[1, 2, 3, 4, 5].map((stepNumber) => (
               <React.Fragment key={stepNumber}>
@@ -200,13 +200,13 @@ const MultiStepForm = () => {
                   </div>
                   <p className="mt-2 sm:text-sm xs:text-xs text-[10px] h-10 lg:w-32 w-auto text-center">
                     {stepNumber === 1 ? 'Personal Details' :
-                     stepNumber === 2 ? 'Choose Category' :
-                     stepNumber === 3 ? 'Business Details' :
-                     stepNumber === 4 ? 'Bank Details' : 'Document'}
+                      stepNumber === 2 ? 'Choose Category' :
+                        stepNumber === 3 ? 'Business Details' :
+                          stepNumber === 4 ? 'Bank Details' : 'Document'}
                   </p>
                 </div>
                 {stepNumber < 5 && (
-                  <div className={`w-full mb-10 ${step > stepNumber ? 'bg-black h-1' : 'bg-gray-400 h-0.5'}`}/>
+                  <div className={`w-full mb-10 ${step > stepNumber ? 'bg-black h-1' : 'bg-gray-400 h-0.5'}`} />
                 )}
               </React.Fragment>
             ))}
@@ -260,6 +260,9 @@ const MultiStepForm = () => {
                   setData={(data) => setFormData({ ...formData, documentUpload: data })}
                   handleFinalSubmit={handleFinalSubmit}
                   prevStep={prevStep}
+                  userId={userId} // Add userId here
+                  isEcommerce={formData.personalDetails?.isEcommerce}
+                  isService={formData.personalDetails?.isService}
                 />
               )}
             </>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { storage, db, auth } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import { AiOutlineClose, AiOutlineCheck, AiOutlineLoading3Quarters } from 'react-icons/ai';
@@ -50,7 +49,14 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
     };
 
     const uploadFile = async (file, documentType) => {
-        const storageRef = ref(storage, `documents/${userId}/${documentType}`);
+        // Create unique filename with timestamp
+        const timestamp = Date.now();
+        const fileExtension = file.name.split('.').pop();
+        const fileName = `${documentType}_${timestamp}.${fileExtension}`;
+        
+        // Create unique path for each vendor's document
+        const storageRef = ref(storage, `vendors/${userId}/documents/${fileName}`);
+        
         await uploadBytes(storageRef, file);
         return await getDownloadURL(storageRef);
     };

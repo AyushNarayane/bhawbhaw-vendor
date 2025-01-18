@@ -94,81 +94,84 @@ const CouponTable = ({ data, columns, onToggleStatus, onAddClick, activeTab }) =
        
       </div>
 
-      <div className="bg-white rounded-lg shadow-md mt-4">
-        <Table className="border-none overflow-hidden rounded-t-lg">
-          <TableHeader className="min-w-10 bg-[#F3EAE7] rounded-t-lg">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-gray-50 bg-[#F3EAE7] rounded-t-lg">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="py-3 font-semibold">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-                <TableHead className="py-3 font-semibold">Actions</TableHead>
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, index) => {
-                const bgColor = index % 2 === 0 ? "bg-white" : "bg-[#F3EAE7]";
-                return (
-                  <TableRow 
-                  key={row.id} 
-                  className={`${bgColor} my-1 shadow-sm border-none overflow-hidden rounded-xl`}
-                  >
-                  {row.getVisibleCells().map((cell, cellIndex) => (
-                    <TableCell 
-                    key={cell.id} 
-                    className={`px-3 py-1 ${cellIndex === 0 ? 'rounded-s-xl' : ''}`}
-                    >
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                    </TableCell>
+      <div className="bg-white rounded-lg shadow-md mt-4 overflow-x-auto">
+        <div className="min-w-[400px] md:min-w-full">
+          <Table className="border-none overflow-hidden rounded-t-lg">
+            <TableHeader className="min-w-10 bg-[#F3EAE7] rounded-t-lg">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="border-b transition-colors hover:bg-gray-50 bg-[#F3EAE7] rounded-t-lg">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="py-3 font-semibold">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
                   ))}
-                  <TableCell className="px-3 py-2 rounded-e-xl">
-                    <Button
-                    onClick={() => onToggleStatus(row.original.id, row.original.status)}
-                    className="bg-white text-black border border-[#F3EAE7] rounded-full"
+                  <TableHead className="py-3 font-semibold">Actions</TableHead>
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row, index) => {
+                  const bgColor = index % 2 === 0 ? "bg-white" : "bg-[#F3EAE7]";
+                  return (
+                    <TableRow 
+                    key={row.id} 
+                    className={`${bgColor} my-1 shadow-sm border-none overflow-hidden rounded-xl`}
                     >
-                    {row.original.status === "Active" ? "Disable" : "Active"}
-                    </Button>
+                    {row.getVisibleCells().map((cell, cellIndex) => (
+                      <TableCell 
+                      key={cell.id} 
+                      className={`px-3 py-1 ${cellIndex === 0 ? 'rounded-s-xl' : ''}`}
+                      >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                      </TableCell>
+                    ))}
+                    <TableCell className="px-3 py-2 rounded-e-xl">
+                      <Button
+                      onClick={() => onToggleStatus(row.original.id, row.original.status)}
+                      className="bg-white text-black border border-[#F3EAE7] rounded-full"
+                      >
+                      {row.original.status === "Active" ? "Disable" : "Active"}
+                      </Button>
+                    </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length + 1}
+                    className="h-[400px] text-center"
+                  >
+                    <EmptyState onAddClick={onAddClick} activeTab={activeTab} />
                   </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length + 1}
-                  className="h-[400px] text-center"
-                >
-                  <EmptyState onAddClick={onAddClick} activeTab={activeTab} />
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0 py-4">
+        <div className="text-sm text-muted-foreground">
          
         
         </div>
-        <div className="space-x-2">
+        <div className="flex space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm"
           >
             Previous
           </Button>
@@ -177,6 +180,7 @@ const CouponTable = ({ data, columns, onToggleStatus, onAddClick, activeTab }) =
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            className="px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm"
           >
             Next
           </Button>
@@ -319,159 +323,158 @@ const CouponsPage = () => {
   
   return (
     <div className="sm:px-6 py-6 px-2">
-      <div className="flex flex-wrap justify-between mb-3">
-        <h1 className="text-4xl font-bold sm:mb-6 mb-2 text-[#4D413E]">Coupons</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 className="text-3xl sm:text-4xl font-bold text-[#4D413E]">Coupons</h1>
 
-        {/* Top Controls */}
-        <div className="flex sm:flex-nowrap flex-wrap sm:justify-between justify-start items-center mb-4">
-          {/* Add Coupon */}
-          <Dialog onOpenChange={setOpenDialogue} open={openDialogue}>
-            <DialogTrigger asChild>
-              <Button className="rounded-md text-sm bg-[#695d56] text-white mr-3">
-                Add Coupon
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-white">
-              <DialogHeader>
-                <DialogTitle>Add a Coupon</DialogTitle>
-                <DialogDescription>
-                  Enter details for the new coupon.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="flex flex-col items-center gap-2">
-                  <Label htmlFor="couponTitle" className="flex justify-start w-full ml-1">
-                  Coupon Name
-                  </Label>
-                  <Input
-                    id="couponTitle"
-                    placeholder="Coupon Name"
-                    value={couponTitle}
-                    onChange={(e) => setCouponTitle(e.target.value)}
-                    className="bg-zinc-100"
-                  />
-                  {error && <span className="text-red-500 text-start w-full text-[10px]">{error}</span>}
+        {/* Top Controls - Restructured for better mobile layout */}
+        <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-4">
+          {/* Add Coupon Button */}
+          <div className="flex-none">
+            <Dialog onOpenChange={setOpenDialogue} open={openDialogue}>
+              <DialogTrigger asChild>
+                <Button className="w-full sm:w-auto rounded-md text-sm bg-[#695d56] text-white">
+                  Add Coupon
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] bg-white">
+                <DialogHeader>
+                  <DialogTitle>Add a Coupon</DialogTitle>
+                  <DialogDescription>
+                    Enter details for the new coupon.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="flex flex-col items-center gap-2">
+                    <Label htmlFor="couponTitle" className="flex justify-start w-full ml-1">
+                    Coupon Name
+                    </Label>
+                    <Input
+                      id="couponTitle"
+                      placeholder="Coupon Name"
+                      value={couponTitle}
+                      onChange={(e) => setCouponTitle(e.target.value)}
+                      className="bg-zinc-100"
+                    />
+                    {error && <span className="text-red-500 text-start w-full text-[10px]">{error}</span>}
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Label htmlFor="discount" className="flex w-full justify-start">
+                    Percentage Discount
+                    </Label>
+                    <Input
+                      id="discount"
+                      placeholder="e.g., 20%"
+                      value={discount}
+                      onChange={(e) => setDiscount(e.target.value)}
+                      className="bg-zinc-100"
+                    />
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Label htmlFor="minPrice" className="flex w-full justify-start">
+                      Minimum Price
+                    </Label>
+                    <Input
+                      id="minPrice"
+                      placeholder="e.g., Rs. 500"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      className="bg-zinc-100"
+                    />
+                  </div>
                 </div>
-                <div className="flex flex-col items-center gap-2">
-                  <Label htmlFor="discount" className="flex w-full justify-start">
-                  Percentage Discount
-                  </Label>
-                  <Input
-                    id="discount"
-                    placeholder="e.g., 20%"
-                    value={discount}
-                    onChange={(e) => setDiscount(e.target.value)}
-                    className="bg-zinc-100"
-                  />
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                  <Label htmlFor="minPrice" className="flex w-full justify-start">
-                    Minimum Price
-                  </Label>
-                  <Input
-                    id="minPrice"
-                    placeholder="e.g., Rs. 500"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                    className="bg-zinc-100"
-                  />
-                </div>
-              </div>
-              <DialogFooter className="gap-2 flex flex-col">
-                <Button
-                  disabled={!couponTitle || !discount || !minPrice}
-                  className="bg-baw-baw-g3 text-white"
-                  onClick={async () => {
-                    if (!isValidCouponTitle(couponTitle)) {
-                      setError("Coupon name must have 4 uppercase letters and 2 digits.");
-                      return;
-                    }
-                    setError("");       
-                    setLoading(true);
-                    try {
-                      const response = await fetch('/api/coupon/addCoupon', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          couponTitle: couponTitle,
-                          discount: parseInt(discount),
-                          timesUsed:0,
-                          minPrice: parseInt(minPrice),
-                          vendorId: currentUser?.id,
-                        }),
-                      });
-                      if (response.ok) {
-                        const newCoupon = await response.json();
-                        console.log(newCoupon)
-                        setCoupons((prevCoupons) => [...prevCoupons, newCoupon.data]);
-                        setCouponTitle("");
-                        setDiscount("");
-                        setMinPrice("");
-                        toast.success("Coupon added successfully!")
-                      } else {
-                        console.error("Failed to add the coupon");
+                <DialogFooter className="gap-2 flex flex-col">
+                  <Button
+                    disabled={!couponTitle || !discount || !minPrice}
+                    className="bg-baw-baw-g3 text-white"
+                    onClick={async () => {
+                      if (!isValidCouponTitle(couponTitle)) {
+                        setError("Coupon name must have 4 uppercase letters and 2 digits.");
+                        return;
                       }
-                    } catch (error) {
-                      console.error("Error adding coupon", error);
-                    }
-                    setLoading(false);
-                    setOpenDialogue(false);
-                  }}
-                >
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Coupon"}
-                </Button>
-                <Button variant="outline" onClick={() => setOpenDialogue(false)}>
-                  Cancel
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-       
-                <DropdownMenu>
-
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="mr-4 flex items-center">
-                  Sort by Date
-                  <FiChevronDown className="ml-2"  />
+                      setError("");       
+                      setLoading(true);
+                      try {
+                        const response = await fetch('/api/coupon/addCoupon', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            couponTitle: couponTitle,
+                            discount: parseInt(discount),
+                            timesUsed:0,
+                            minPrice: parseInt(minPrice),
+                            vendorId: currentUser?.id,
+                          }),
+                        });
+                        if (response.ok) {
+                          const newCoupon = await response.json();
+                          console.log(newCoupon)
+                          setCoupons((prevCoupons) => [...prevCoupons, newCoupon.data]);
+                          setCouponTitle("");
+                          setDiscount("");
+                          setMinPrice("");
+                          toast.success("Coupon added successfully!")
+                        } else {
+                          console.error("Failed to add the coupon");
+                        }
+                      } catch (error) {
+                        console.error("Error adding coupon", error);
+                      }
+                      setLoading(false);
+                      setOpenDialogue(false);
+                    }}
+                  >
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Coupon"}
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white">
-                  <DropdownMenuItem 
-                  onSelect={() => {
-                    const sorted = [...filteredCoupons].sort((a, b) => {
-                    const dateA = new Date(a.createdAt?.seconds * 1000 || a.createdAt);
-                    const dateB = new Date(b.createdAt?.seconds * 1000 || b.createdAt);
-                    return dateB - dateA;
-                    });
-                    setFilteredCoupons(sorted);
-                  }}
-                  >
-                  Newest First
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                  onSelect={() => {
-                    const sorted = [...filteredCoupons].sort((a, b) => {
-                    const dateA = new Date(a.createdAt?.seconds * 1000 || a.createdAt);
-                    const dateB = new Date(b.createdAt?.seconds * 1000 || b.createdAt);
-                    return dateA - dateB;
-                    });
-                    setFilteredCoupons(sorted);
-                  }}
-                  >
-                  Oldest First
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-                </DropdownMenu>
+                  <Button variant="outline" onClick={() => setOpenDialogue(false)}>
+                    Cancel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
 
-                {/* Filter Dropdown */}
-         
+          {/* Search and Filter Controls */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-auto flex items-center justify-between">
+                  Sort by Date
+                  <FiChevronDown className="ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white">
+                <DropdownMenuItem 
+                onSelect={() => {
+                  const sorted = [...filteredCoupons].sort((a, b) => {
+                  const dateA = new Date(a.createdAt?.seconds * 1000 || a.createdAt);
+                  const dateB = new Date(b.createdAt?.seconds * 1000 || b.createdAt);
+                  return dateB - dateA;
+                  });
+                  setFilteredCoupons(sorted);
+                }}
+                >
+                Newest First
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                onSelect={() => {
+                  const sorted = [...filteredCoupons].sort((a, b) => {
+                  const dateA = new Date(a.createdAt?.seconds * 1000 || a.createdAt);
+                  const dateB = new Date(b.createdAt?.seconds * 1000 || b.createdAt);
+                  return dateA - dateB;
+                  });
+                  setFilteredCoupons(sorted);
+                }}
+                >
+                Oldest First
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          {/* Search Input */}
-          <div className="flex items-center">
-                <Input
-                  placeholder="Search coupons..."
-                  value={searchQuery}
-                  onChange={(e) => {
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Input
+                placeholder="Search coupons..."
+                value={searchQuery}
+                onChange={(e) => {
                   setSearchQuery(e.target.value);
                   const query = e.target.value.toLowerCase();
                   const filtered = coupons.filter(coupon => 
@@ -483,27 +486,28 @@ const CouponsPage = () => {
                     )
                   );
                   setFilteredCoupons(filtered);
-                  }}
-                  className="mr-4"
-                />
-                <Button variant="outline" onClick={fetchCoupons}>
-                  {refresh ? (
-                    <ClipLoader size={17} color={"#000"} loading={refresh} />
-                  ) : (
-                    <IoMdRefresh className="text-xl" />
-                  )}
-                </Button>
-                </div>
-              </div>
-              </div>
+                }}
+                className="flex-1"
+              />
+              <Button variant="outline" onClick={fetchCoupons} className="flex-none">
+                {refresh ? (
+                  <ClipLoader size={17} color={"#000"} loading={refresh} />
+                ) : (
+                  <IoMdRefresh className="text-xl" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              {/* Tab buttons */}
-      <div className="">
+      {/* Tab buttons */}
+      <div className="flex flex-wrap gap-2 mb-4">
         {tabs.map((tab) => (
           <Button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 mb-5 me-4 py-2 ${
+            className={`px-3 py-1 sm:px-4 sm:py-2 ${
               activeTab === tab ? "bg-[#695d56] text-white" : "text-[#695d56]"
             }`}
             variant={activeTab === tab ? "solid" : "outline"}
