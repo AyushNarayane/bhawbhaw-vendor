@@ -96,7 +96,11 @@ export function AuthProvider({ children }) {
 
   // Show loading state
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-20 h-20 border-4 #F3EAE7 rounded-full animate-spin border-t-transparent"></div>
+      </div>
+    );
   }
 
   const value = {

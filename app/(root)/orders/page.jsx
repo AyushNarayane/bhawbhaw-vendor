@@ -45,9 +45,6 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { db } from '@/firebase';
 
 const OrderTable = ({ data, columns, onView, onChangeStatus }) => {
-  const [search, setSearch] = useState("orderId");
-  const searchTitles = ["orderId", "productTitle", "status", "shippingAddress"];
-
   const table = useReactTable({
     data,
     columns,
@@ -58,40 +55,9 @@ const OrderTable = ({ data, columns, onView, onChangeStatus }) => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-        <div className="w-full md:w-auto">
-          <Input
-            placeholder="Search by search type..."
-            value={table.getColumn(search)?.getFilterValue() || ""}
-            onChange={(event) =>
-              table.getColumn(search)?.setFilterValue(event.target.value)
-            }
-            className="w-full md:w-[300px]"
-          />
-        </div>
-        <Select
-          onValueChange={(e) => {
-            setSearch(e);
-          }}
-        >
-          <SelectTrigger className="bg-zinc-100 border-0 focus:ring-0 text-black ring-offset-0 focus:ring-offset-0 capitalize outline-none w-1/4">
-            <SelectValue placeholder="Select a search type" />
-          </SelectTrigger>
-
-          <SelectContent>
-            {searchTitles.map((mt) => (
-              <SelectItem key={mt} value={mt} className="capitalize">
-                {mt}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex justify-end space-x-2">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
+         
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
@@ -494,9 +460,44 @@ const OrdersPage = () => {
 
   return (
     <div className="p-4 md:p-6">
+      {/* Header with Search */}
       <div className="flex flex-col gap-4 mb-4">
-        <h1 className="text-4xl font-bold">Orders</h1>
-        {/* Tabs in scrollable container */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-bold">Orders</h1>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Input
+                type="search"
+                placeholder="Search by product title..."
+                className="w-[300px] pl-10"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  // Filter orders based on product title
+                  const filtered = allOrders.filter(order => 
+                    order.items?.[0]?.title?.toLowerCase().includes(e.target.value.toLowerCase())
+                  );
+                  setOrders(filtered);
+                }}
+              />
+              <svg
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
         <div className="overflow-x-auto -mx-4 px-4">
           <div className="flex gap-2 min-w-max pb-2">
             {tabs.map((tab) => (

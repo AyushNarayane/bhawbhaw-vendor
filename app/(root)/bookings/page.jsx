@@ -46,9 +46,6 @@ import {
 } from "@/components/ui/dialog";
 
 const BookingTable = ({ data, columns, onView, onChangeStatus }) => {
-  const [search, setSearch] = useState("bookingID");
-  const searchTitles = ["bookingID", "serviceName", "name", "phoneNumber"];
-
   const table = useReactTable({
     data,
     columns,
@@ -59,36 +56,11 @@ const BookingTable = ({ data, columns, onView, onChangeStatus }) => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-        <div className="w-full md:w-auto">
-          <Input
-            placeholder="Search by search type..."
-            value={table.getColumn(search)?.getFilterValue() || ""}
-            onChange={(event) =>
-              table.getColumn(search)?.setFilterValue(event.target.value)
-            }
-            className="w-full md:w-[300px] focus:outline-none rounded-lg bg-[#F3EAE7] text-[#85716B]"
-          />
-        </div>
-        <Select
-          onValueChange={(e) => {
-            setSearch(e);
-          }}
-        >
-          <SelectTrigger className="bg-zinc-100 border-0 focus:ring-0 text-black ring-offset-0 focus:ring-offset-0 capitalize outline-none w-1/4">
-            <SelectValue placeholder="Select a search type" />
-          </SelectTrigger>
-          <SelectContent>
-            {searchTitles.map((mt) => (
-              <SelectItem key={mt} value={mt} className="capitalize">
-                {mt}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-       
+      <div className="flex justify-end space-x-2">
+        <DropdownMenu>
+          {/* ... existing dropdown menu code ... */}
+        </DropdownMenu>
       </div>
-
       <div className="rounded-lg shadow-md shadow-md w-full max-w-[95vw] overflow-x-auto">
         <Table className="border-none  min-w-[800px]">
           <TableHeader className="min-w-10">
@@ -325,32 +297,49 @@ const BookingPage = () => {
 
   return (
     <div className="sm:px-6 py-6 px-2">
-      <div className="flex flex-wrap justify-between mb-3">
-        <h1 className="text-4xl font-bold sm:mb-6 mb-2 text-[#4D413E]">Bookings</h1>
-
-        <div className="flex sm:flex-nowrap flex-wrap sm:justify-between justify-start items-center mb-4">
-          {/* Controls section */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="mr-4 sm:mt-0 mt-2 flex items-center">
-                Sort
-                <FiChevronDown className="ml-2" />
-              </Button>
-            </DropdownMenuTrigger>
-            {/* ...existing dropdown content... */}
-          </DropdownMenu>
-
-          {/* ...existing controls... */}
+      {/* Header with Search */}
+      <div className="flex flex-wrap items-center justify-between mb-6">
+        <h1 className="text-4xl font-bold text-[#4D413E]">Bookings</h1>
+        
+        {/* Search Bar */}
+        <div className="relative w-[300px]">
+          <Input
+            type="search"
+            placeholder="Search by Booking ID..."
+            className="pl-10 pr-4 py-2 border rounded-lg bg-[#F3EAE7] text-[#85716B] focus:outline-none focus:ring-2 focus:ring-[#B29581]"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              // Filter bookings based on booking ID
+              const filtered = orders.filter(booking => 
+                booking.bookingID.toLowerCase().includes(e.target.value.toLowerCase())
+              );
+              setOrders(filtered);
+            }}
+          />
+          <svg
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#85716B]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
         </div>
       </div>
 
       {/* Tab buttons */}
-      <div className="flex md:flex-wrap flex-nowrap sm:mb-6 mb-2 table-scrollbar overflow-x-auto">
+      <div className="flex md:flex-wrap flex-nowrap mb-6 table-scrollbar overflow-x-auto">
         {tabs.map((tab) => (
           <Button
             key={tab}
             onClick={() => setSelectedTab(tab)}
-            className={`px-4 mb-5 me-4 py-2 ${
+            className={`px-4 me-4 py-2 ${
               selectedTab === tab ? "bg-[#B29581] text-white" : "text-[#B29581]"
             } hover:bg-[#a0846f]`}
             variant={selectedTab === tab ? "solid" : "outline"}
@@ -360,7 +349,8 @@ const BookingPage = () => {
         ))}
       </div>
 
-      <div className="bg-white p-6 rounded-lg ">        <BookingTable 
+      <div className="bg-white p-6 rounded-lg">
+        <BookingTable 
           data={currentBookings}
           columns={columns}
           onView={(booking) => setViewBooking(booking)}
