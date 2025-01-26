@@ -80,7 +80,7 @@ const EmptyState = ({ onAddClick }) => (
   </div>
 );
 
-export default function OrdersPage() {
+const OrdersPage = () => {
   const { currentUser } = useAuth();
   const [selectedTab, setSelectedTab] = useState("Raise new issue");
   const [searchQuery, setSearchQuery] = useState("");
@@ -304,6 +304,105 @@ export default function OrdersPage() {
 
   const searchTitles = ["id", "title", "status", "createdAt"];
 
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      // Add console.log to debug currentUser data
+      console.log("Current user data:", currentUser);
+      console.log("Personal details:", currentUser?.personalDetails);
+
+      const payload = {
+        vendorId: currentUser?.id,
+        vendorUId: currentUser?.uid,
+        title,
+        description,
+        vendorDetails: {
+          name: currentUser?.personalDetails?.name || '',
+          email: currentUser?.personalDetails?.email || '',
+          phoneNumber: currentUser?.personalDetails?.phoneNumber || '',
+          address: currentUser?.personalDetails?.address || '',
+          businessName: currentUser?.personalDetails?.businessName || '',
+          vendorType: currentUser?.personalDetails?.vendorType || '',
+          gstin: currentUser?.personalDetails?.gstin || '',
+          // Add any other relevant personal details
+        }
+      };
+
+      console.log("Sending payload:", payload); // Debug log
+
+      const response = await fetch('/api/addVendorQuery', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Query added successfully:", result);
+        setTitle("");
+        setDescription("");
+        setChanged((curr) => !curr);
+        setIsQueryAdded(true);
+        toast.success("Successfully Generated the Query");
+      } else {
+        const error = await response.json();
+        console.error("Failed to generate query:", error);
+        toast.error("Failed to generate the query");
+      }
+    } catch (error) {
+      console.error("Error in adding query:", error);
+      toast.error("Error generating query");
+    }
+    setLoading(false);
+    setOpenDialogue(false);
+  };
+
+  const ViewDialog = () => (
+    <Dialog open={viewModal} onOpenChange={handleViewClose}>
+      <DialogContent className="sm:max-w-[425px] bg-white">
+        <DialogHeader>
+          <DialogTitle>Query Details</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {/* Vendor Details Section */}
+          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+            <h3 className="font-semibold text-gray-700">Vendor Details</h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <p className="text-gray-600">Name</p>
+                <p>{item?.vendorDetails?.name || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Business</p>
+                <p>{item?.vendorDetails?.businessName || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Email</p>
+                <p>{item?.vendorDetails?.email || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Phone</p>
+                <p>{item?.vendorDetails?.phoneNumber || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Query Details */}
+          <div className="flex flex-col">
+            <span className="m-2">Query Title</span>
+            <Input readOnly value={item?.title || ''} className="rounded-xl" />
+          </div>
+          {/* ... rest of the existing dialog content ... */}
+        </div>
+        <DialogFooter>
+          <Button onClick={handleViewClose}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <div className="p-6">
       <div className="flex justify-between mb-3">
@@ -375,37 +474,7 @@ export default function OrdersPage() {
                       disabled={title === "" || description === ""}
                       type="button"
                       className="bg-baw-baw-g3 text-white"
-                      onClick={async () => {
-                        setLoading(true);
-                        try {
-                          const response = await fetch('/api/addVendorQuery', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              vendorId: currentUser?.id,
-                              title,
-                              description,
-                              vendorUId: currentUser?.uid,
-                            }),
-                          });
-
-                          if (response.ok) {
-                            setTitle("");
-                            setDescription("");
-                            setChanged((curr) => !curr);
-                            setIsQueryAdded(true);
-                            toast.success("Successfully Generated the Query");
-                          } else {
-                            toast.error("Failed to generate the query");
-                          }
-                        } catch (error) {
-                          console.log("Error in adding query", error);
-                        }
-                        setLoading(false);
-                        setOpenDialogue(false);
-                      }}
+                      onClick={handleSubmit}
                     >
                       {loading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -576,63 +645,7 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      <Dialog open={viewModal} onOpenChange={handleViewClose}>
-        <DialogContent className="sm:max-w-[425px] bg-white">
-          <DialogHeader>
-            <DialogTitle>Query Details</DialogTitle>
-          </DialogHeader>
-          <div>
-            <div className="flex flex-col">
-              <span className="m-2">Query Title</span>
-              <Input readOnly value={item?.title || ''} className="rounded-xl" />
-            </div>
-            <div className="flex flex-col">
-              <span className="m-2">Query Description</span>
-              <Textarea
-                readOnly
-                value={item?.description || ''}
-                className="rounded-xl"
-              />
-            </div>
-          </div>
-          {item?.status === "active" ? (
-            <></>
-          ) : (
-            <div className="flex flex-col">
-              <span className="m-2">Resolved Message</span>
-              <Textarea
-                readOnly
-                value={item?.resolveMsg || ''}
-                className="rounded-xl"
-              />
-            </div>
-          )}
-          {item?.status === "reopened" ||
-          (item?.status === "closed" && item?.reopenMsg) ? (
-            <div className="flex flex-col">
-              <span className="m-2">Re-Opened Message</span>
-              <Textarea
-                readOnly
-                value={item?.reopenMsg || ''}
-                className="rounded-xl"
-              />
-            </div>
-          ) : null}
-          {item?.status === "closed" ? (
-            <div className="flex flex-col">
-              <span className="m-2">Closed Message</span>
-              <Textarea
-                readOnly
-                value={item?.closeMsg || ''}
-                className="rounded-xl"
-              />
-            </div>
-          ) : null}
-          <DialogFooter>
-            <Button onClick={handleViewClose}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ViewDialog />
 
       <Dialog open={sendModal} onOpenChange={handleSendClose}>
         <DialogContent className="sm:max-w-[425px] bg-white">
@@ -642,7 +655,7 @@ export default function OrdersPage() {
           <div>
             <div className="flex flex-col">
               <span className="m-2">Subject</span>
-              <div className="rounded-xl border-solid border border-gray-400 p-4">
+              <div className="rounded-xl border-solid border border-gray-400 p-4"></div>
                 {item?.queryId}: Issue Re-Opened
               </div>
             </div>
@@ -666,17 +679,18 @@ export default function OrdersPage() {
                 className="rounded-xl"
               />
             </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleReopen} className="bg-baw-baw-g3 text-white">
-              Re-Open
-            </Button>
-            <Button variant="outline" onClick={handleSendClose}>
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
+            <DialogFooter>
+              <Button onClick={handleReopen} className="bg-baw-baw-g3 text-white">
+                Re-Open
+              </Button>
+              <Button variant="outline" onClick={handleSendClose}>
+                Cancel
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
 }
+
+export default OrdersPage;

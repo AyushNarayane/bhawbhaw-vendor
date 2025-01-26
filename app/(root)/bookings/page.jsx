@@ -44,8 +44,10 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/firebase';
 
-const BookingTable = ({ data, columns, onView, onChangeStatus }) => {
+const BookingTable = ({ data, columns, onView, onChangeStatus, onAssign }) => {
   const table = useReactTable({
     data,
     columns,
@@ -76,7 +78,7 @@ const BookingTable = ({ data, columns, onView, onChangeStatus }) => {
                         )}
                   </TableHead>
                 ))}
-                <TableHead className="py-3 font-semibold text-[#4D413E]">Actions</TableHead>
+                <TableHead className="py-3 font-semibold pl-16 text-[#4D413E]">Actions</TableHead>
               </TableRow>
             ))}
           </TableHeader>
@@ -113,6 +115,12 @@ const BookingTable = ({ data, columns, onView, onChangeStatus }) => {
                           className="bg-white hover:bg-[#a0846f] text-black"
                         >
                           Change Status
+                        </Button>
+                        <Button
+                          onClick={() => onAssign(row.original)}
+                          className="bg-[#85716B] hover:bg-[#6b5a55] text-white"
+                        >
+                          Assign
                         </Button>
                       </div>
                     </TableCell>
@@ -172,6 +180,10 @@ const BookingPage = () => {
   const [viewBooking, setViewBooking] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState("");
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedTeamMember, setSelectedTeamMember] = useState("");
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   const ordersPerPage = 5;
   const tabs = ["Completed", "Cancelled", "Incoming"];
@@ -191,6 +203,29 @@ const BookingPage = () => {
     };
     fetchOrders();
   }, []);
+
+  const fetchTeamMembers = async () => {
+    try {
+      const teamQuery = query(
+        collection(db, "team-vendor"),
+        where("vendorId", "==", currentUser.id)
+      );
+      const querySnapshot = await getDocs(teamQuery);
+      const members = [];
+      querySnapshot.forEach((doc) => {
+        members.push({ id: doc.id, ...doc.data() });
+      });
+      setTeamMembers(members);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      fetchTeamMembers();
+    }
+  }, [currentUser]);
 
   const applyFilters = (data) => {
     let filteredData = data;
@@ -266,6 +301,31 @@ const BookingPage = () => {
       }
     } catch (error) {
       console.error("Failed to update status:", error.message);
+    }
+  };
+
+  const handleAssign = async () => {
+    if (!selectedTeamMember || !selectedBooking) return;
+
+    try {
+      const response = await fetch(`/api/services/assignBooking`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: selectedBooking.bookingID,
+          teamMemberId: selectedTeamMember,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Successfully assigned booking");
+        setIsAssignModalOpen(false);
+        // Refresh bookings
+        fetchOrders();
+      }
+    } catch (error) {
+      console.error("Error assigning booking:", error);
+      toast.error("Failed to assign booking");
     }
   };
 
@@ -358,6 +418,10 @@ const BookingPage = () => {
             setViewBooking(booking);
             setIsStatusModalOpen(true);
           }}
+          onAssign={(booking) => {
+            setSelectedBooking(booking);
+            setIsAssignModalOpen(true);
+          }}
         />
       </div>
 
@@ -416,7 +480,38 @@ const BookingPage = () => {
           </DialogContent>
         </Dialog>
       )}
-
+      <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Assign Booking</DialogTitle>
+            <DialogDescription>
+              Select a team member to assign this booking to:
+            </DialogDescription>
+          </DialogHeader>
+          <select
+            value={selectedTeamMember}
+            onChange={(e) => setSelectedTeamMember(e.target.value)}
+            className="mt-2 p-2 border rounded w-full"
+          >
+            <option value="">Select Team Member</option>
+            {teamMembers.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name} - {member.department}
+              </option>
+            ))}
+          </select>
+          <DialogFooter>
+            <Button onClick={() => setIsAssignModalOpen(false)}>Cancel</Button>
+            <Button 
+              onClick={handleAssign}
+              disabled={!selectedTeamMember}
+              className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
+            >
+              Assign
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

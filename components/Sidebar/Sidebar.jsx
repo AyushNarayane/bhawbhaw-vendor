@@ -68,6 +68,7 @@ const Sidebar = () => {
                 <>
                   <SidebarLink Icon={PiWalletThin} label="Bookings" href="/bookings" />
                   <SidebarLink Icon={PiWalletThin} label="Services" href="/services" />
+                  <SidebarLink Icon={PiWalletThin} label="Teams" href="/teams" />
                 </>
               )}
 
