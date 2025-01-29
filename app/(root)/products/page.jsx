@@ -818,236 +818,273 @@ const handleFileUpload = (event) => {
                     >
                       Add Product Details
                     </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+                    </div>
+                    </div>
+                    </div>
+                    )}
+                    </div>
 
-        </>
-      )}
+                    </>
+                    )}
 
-      {modalOpen && (
-      <Dialog open={modalOpen} onOpenChange={() => setModalOpen(false)}>
-        <DialogContent className="max-w-[70rem] p-6 bg-white rounded-lg shadow-lg">
-          <DialogHeader>
-            <DialogTitle className="text-3xl text-[#4D413E] font-bold">
-              Upload Product
-            </DialogTitle>
-          </DialogHeader>
-        <div className="relative grid grid-cols-3 gap-4 mt-4">
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="title">
-              Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter Title"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                    {modalOpen && (
+                    <Dialog open={modalOpen} onOpenChange={() => setModalOpen(false)}>
+                    <DialogContent className="max-w-[70rem] p-6 bg-white rounded-lg shadow-lg">
+                      <DialogHeader>
+                        <DialogTitle className="text-3xl text-[#4D413E] font-bold">
+                          Upload Product  
+                        </DialogTitle>
+                      </DialogHeader>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="category">
-              Category
-            </label>
-            <Select
-              value={category}
-              onValueChange={(e) => setCategory(e)}
-              className="max-h-10 "
-            >
-              <SelectTrigger className="rounded-full w-full p-2 bg-[#F3EAE7]">
-                <SelectValue placeholder="Select category"/>
-              </SelectTrigger>
-              <SelectContent side="bottom" className="bg-white">
-                <SelectGroup className="bg-white max-h-24 ">
-                    {Categories.map((category, i) => (
-                      <SelectItem key={i} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+                      {/* Grid Container */}
+                      <div className="relative grid grid-cols-3 gap-4 mt-4">
+                        
+                        {/* Title */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="title">
+                            Title
+                          </label>
+                          <input
+                            id="title"
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Enter Title"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="category">
-              Sub Category
-            </label>
-            <Select
-              value={subCategory}
-              onValueChange={(e) => setSubCategory(e)}
-              className="max-h-10 "
-            >
-              <SelectTrigger className="rounded-full w-full p-2 bg-[#F3EAE7]">
-                <SelectValue placeholder="Select subCategory"/>
-              </SelectTrigger>
-              <SelectContent side="bottom" className="bg-white">
-                <SelectGroup className="bg-white max-h-24 ">
-                    {subCategories.map((category, i) => (
-                      <SelectItem key={i} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+                        {/* Category */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="category">
+                            Category
+                          </label>
+                          <Select
+                            value={category}
+                            onValueChange={(e) => setCategory(e)} 
+                            className="max-h-10"
+                          >
+                            <SelectTrigger className="rounded-full w-full p-2 bg-[#F3EAE7]">
+                              <SelectValue placeholder="Select category"/>
+                            </SelectTrigger>
+                            <SelectContent side="bottom" className="bg-white">
+                              <SelectGroup 
+                                className="bg-white max-h-24"
+                                style={{ 
+                                  overflowY: 'auto',
+                                  scrollBehavior: 'smooth',
+                                  '-webkit-overflow-scrolling': 'touch'
+                                }}
+                              >
+                                {Categories.map((category, i) => (
+                                  <SelectItem 
+                                    key={i} 
+                                    value={category}
+                                    className="transition-colors duration-200 hover:bg-[#F3EAE7]"
+                                  >
+                                    {category}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="maxRetailPrice">
-              Maximum Retail Price
-            </label>
-            <input
-              id="maxRetailPrice"
-              type="text"
-              value={maxRetailPrice}
-              onChange={(e) => setMaxRetailPrice(e.target.value)}
-              placeholder="Enter Maximum Retail Price"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                        {/* Sub Category */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="category">
+                            Sub Category
+                          </label>
+                          <Select
+                            value={subCategory}
+                            onValueChange={(e) => setSubCategory(e)}
+                            className="max-h-10"
+                          >
+                            <SelectTrigger className="rounded-full w-full p-2 bg-[#F3EAE7]">
+                              <SelectValue placeholder="Select subCategory"/>
+                            </SelectTrigger>
+                            <SelectContent side="bottom" className="bg-white">
+                              <SelectGroup 
+                                className="bg-white max-h-24"
+                                style={{ 
+                                  overflowY: 'auto',
+                                  scrollBehavior: 'smooth',
+                                  '-webkit-overflow-scrolling': 'touch'
+                                }}
+                              >
+                                {subCategories.map((category, i) => (
+                                  <SelectItem 
+                                    key={i} 
+                                    value={category}
+                                    className="transition-colors duration-200 hover:bg-[#F3EAE7]"
+                                  >
+                                    {category}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
 
+                        {/* Maximum Retail Price */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="maxRetailPrice">
+                            Maximum Retail Price
+                          </label>
+                          <input
+                            id="maxRetailPrice"
+                            type="text"
+                            value={maxRetailPrice}
+                            onChange={(e) => setMaxRetailPrice(e.target.value)}
+                            placeholder="Enter Maximum Retail Price"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="minOrderQty">
-              Minimum Order Quantity
-            </label>
-            <input
-              id="minOrderQty"
-              type="text"
-              value={minOrderQty}
-              onChange={(e) => setMinOrderQty(e.target.value)}
-              placeholder="Enter Minimum Order Quantity"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                        {/* Minimum Order Quantity */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="minOrderQty">
+                            Minimum Order Quantity
+                          </label>
+                          <input
+                            id="minOrderQty"
+                            type="text"
+                            value={minOrderQty}
+                            onChange={(e) => setMinOrderQty(e.target.value)}
+                            placeholder="Enter Minimum Order Quantity"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="sellingPrice">
-              Selling Price
-            </label>
-            <input
-              id="sellingPrice"
-              type="text"
-              value={sellingPrice}
-              onChange={(e) => setSellingPrice(e.target.value)}
-              placeholder="Enter Selling Price"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                        {/* Selling Price */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="sellingPrice">
+                            Selling Price
+                          </label>
+                          <input
+                            id="sellingPrice"
+                            type="text"
+                            value={sellingPrice}
+                            onChange={(e) => setSellingPrice(e.target.value)}
+                            placeholder="Enter Selling Price"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="description">
-              Description
-            </label>
-            <input
-              id="description"
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter Description"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                        {/* Description */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="description">
+                            Description
+                          </label>
+                          <input
+                            id="description"
+                            type="text"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Enter Description"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="material">
-              Material
-            </label>
-            <input
-              id="material"
-              type="text"
-              value={material}
-              onChange={(e) => setMaterial(e.target.value)}
-              placeholder="Enter Material"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                        {/* Material */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="material">
+                            Material
+                          </label>
+                          <input
+                            id="material"
+                            type="text"
+                            value={material}
+                            onChange={(e) => setMaterial(e.target.value)}
+                            placeholder="Enter Material"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="size">
-              Size
-            </label>
-            <input
-              id="size"
-              type="text"
-              value={size}
-              onChange={(e) => setSize(e.target.value)}
-              placeholder="Enter Size"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                        {/* Size */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="size">
+                            Size
+                          </label>
+                          <input
+                            id="size"
+                            type="text"
+                            value={size}
+                            onChange={(e) => setSize(e.target.value)}
+                            placeholder="Enter Size"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="dispatchDays">
-              Days of Dispatch
-            </label>
-            <input
-              id="dispatchDays"
-              type="text"
-              value={dispatchDays}
-              onChange={(e) => setDispatchDays(e.target.value)}
-              placeholder="Enter Days of Dispatch"
-              className="bg-[#F3EAE7] rounded-full w-full p-2 "
-            />
-          </div>
+                        {/* Days of Dispatch */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="dispatchDays">
+                            Days of Dispatch
+                          </label>
+                          <input
+                            id="dispatchDays"
+                            type="text"
+                            value={dispatchDays}
+                            onChange={(e) => setDispatchDays(e.target.value)}
+                            placeholder="Enter Days of Dispatch"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="text-sm text-[#C5A88F]" htmlFor="warranty">
-              Warranty (optional)
-            </label>
-            <input
-              id="warranty"
-              type="text"
-              value={warranty}
-              onChange={(e) => setWarranty(e.target.value)}
-              placeholder="Enter Warranty if any"
-              className="bg-[#F3EAE7] rounded-full w-full p-2"
-            />
-          </div>
+                        {/* Warranty */}
+                        <div>
+                          <label className="text-sm text-[#C5A88F]" htmlFor="warranty">
+                            Warranty (optional)
+                          </label>
+                          <input
+                            id="warranty"
+                            type="text"
+                            value={warranty}
+                            onChange={(e) => setWarranty(e.target.value)}
+                            placeholder="Enter Warranty if any"
+                            className="bg-[#F3EAE7] rounded-full w-full p-2"
+                          />
+                        </div>
 
-          <div>
-            <label className="block text-sm text-[#C5A88F]">
-              Upload Images (Max. 5)
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageUpload}
-              className="mt-1 bg-[#F3EAE7] rounded-full w-full py-[6px] px-3"
-            />
+                        {/* Image Upload */}
+                        <div>
+                          <label className="block text-sm text-[#C5A88F]">
+                            Upload Images (Max. 5)
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                            className="mt-1 bg-[#F3EAE7] rounded-full w-full py-[6px] px-3"
+                          />
 
-            {imagePreviews.length > 0 && (
-              <div
-                style={{ margin: '0 2rem' }}
-                className="absolute left-14 flex justify-center items-center w-[4rem] h-28 pb-1"
-              >
-                <Carousel>
-                  <CarouselContent className="w-40 object-cover ">
-                    {imagePreviews.map((file, i) => (
-                      <CarouselItem key={i} className="flex items-center ">
-                        <img className="max-h-20 mx-auto" alt="image preview" src={file} />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious type="button" className="bg-yellow-300 z-30 " />
-                  <CarouselNext type="button" className="bg-yellow-300 z-30" />
-                </Carousel>
-              </div>
-            )}
+                          {/* Image Preview Carousel */}
+                          {imagePreviews.length > 0 && (
+                            <div
+                              style={{ margin: '0 2rem' }}
+                              className="absolute left-14 flex justify-center items-center w-[4rem] h-28 pb-1"
+                            >
+                              <Carousel opts={{ duration: 500 }}>
+                                <CarouselContent className="w-40 object-cover">
+                                  {imagePreviews.map((file, i) => (
+                                    <CarouselItem key={i} className="flex items-center">
+                                      <img className="max-h-20 mx-auto" alt="image preview" src={file} />
+                                    </CarouselItem>
+                                  ))}
+                                </CarouselContent>
+                                <CarouselPrevious type="button" className="bg-yellow-300 z-30" />
+                                <CarouselNext type="button" className="bg-yellow-300 z-30" />
+                              </Carousel>
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
-          </div>
-        </div>
-
-        <DialogFooter className="flex justify-between mt-6">
-          <button
-            onClick={() => {setModalOpen(false)
+                      {/* Dialog Footer */}
+                      <DialogFooter className="flex justify-between mt-6">
+                        <button
+                          onClick={() => {setModalOpen(false)
               setSelectedProduct(null)
             }}
             className="bg-red-500 text-white rounded-lg px-4 py-2"
