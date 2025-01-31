@@ -516,9 +516,16 @@ useEffect(() => {
 }, [selectedProduct]);
 
 const handleDownload = () => {
-  const fileUrl =
-    "https://docs.google.com/spreadsheets/d/1apsXcvFKR8sNfGAVZOfXKOTyLLaGRErU9f70p00CJh0/edit?usp=sharing&ouid=103883976639323731670&rtpof=true&sd=true";
-  window.open(fileUrl, "_blank");
+  // Sample file URL
+  const fileUrl = "/samplesheet.xlsx"; // Assuming the file is in your public folder
+
+  // Create a temporary anchor element
+  const link = document.createElement("a");
+  link.href = fileUrl;
+  link.download = "../../../public/samplesheet.xlsx";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 const handleFileUpload = (event) => {

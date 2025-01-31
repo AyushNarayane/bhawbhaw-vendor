@@ -240,7 +240,9 @@ const AddServicePage = () => {
     specialization: "",
     availability: "",
     expectedSalary: "",
+    image: null // Add this field
   });
+  const [providerImagePreview, setProviderImagePreview] = useState(null);
   const [providerStatus, setProviderStatus] = useState(null);
 
   const fetchServices = async () => {
@@ -424,13 +426,36 @@ const AddServicePage = () => {
     setProviderData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Add image upload handler for provider
+  const handleProviderImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProviderData(prev => ({ ...prev, image: file }));
+      setProviderImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Modify handleProviderSubmit to include image upload
   const handleProviderSubmit = async () => {
     try {
+      let imageUrl = null;
+      
+      // Upload image if exists
+      if (providerData.image instanceof File) {
+        const timestamp = Date.now();
+        const imagePath = `serviceProviders/${currentUser.id}/${timestamp}_${providerData.image.name}`;
+        const storageRef = ref(storage, imagePath);
+        
+        await uploadBytesResumable(storageRef, providerData.image);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
       const response = await fetch('/api/serviceProvider/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...providerData,
+          imageUrl, // Add the image URL
           vendorId: currentUser.id,
           status: 'unverified'
         }),
@@ -446,7 +471,9 @@ const AddServicePage = () => {
           specialization: "",
           availability: "",
           expectedSalary: "",
+          image: null
         });
+        setProviderImagePreview(null);
         setIsProviderDialogOpen(false);
       } else {
         toast.error("Failed to register service provider");
@@ -623,81 +650,141 @@ const AddServicePage = () => {
       </Dialog>
 
       <Dialog open={isProviderDialogOpen} onOpenChange={setIsProviderDialogOpen}>
-        <DialogContent className="bg-white">
+        <DialogContent className="bg-white max-w-2xl">
           <DialogHeader>
             <DialogTitle>Service Provider Registration</DialogTitle>
             <DialogDescription>Enter your details to register as a service provider.</DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4">
-            <Input 
-              label="Full Name" 
-              name="name" 
-              value={providerData.name} 
-              onChange={handleProviderChange} 
-              required 
-              placeholder="Enter your full name" 
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Left Column - Form Fields */}
+            <div className="space-y-4">
+              <Input 
+                label="Full Name" 
+                name="name" 
+                value={providerData.name} 
+                onChange={handleProviderChange} 
+                required 
+                placeholder="Enter your full name" 
+              />
 
-            <Input 
-              label="Service Type" 
-              name="serviceType" 
-              value={providerData.serviceType} 
-              onChange={handleProviderChange} 
-              required 
-              placeholder="Type of service you provide" 
-            />
+              <Input 
+                label="Service Type" 
+                name="serviceType" 
+                value={providerData.serviceType} 
+                onChange={handleProviderChange} 
+                required 
+                placeholder="Type of service you provide" 
+              />
 
-            <Input 
-              label="Experience (years)" 
-              name="experience" 
-              type="number" 
-              value={providerData.experience} 
-              onChange={handleProviderChange} 
-              required 
-              placeholder="Years of experience" 
-            />
+              <Input 
+                label="Experience (years)" 
+                name="experience" 
+                type="number" 
+                value={providerData.experience} 
+                onChange={handleProviderChange} 
+                required 
+                placeholder="Years of experience" 
+              />
 
-            <Input 
-              label="Qualification" 
-              name="qualification" 
-              value={providerData.qualification} 
-              onChange={handleProviderChange} 
-              required 
-              placeholder="Your highest qualification" 
-            />
+              <Input 
+                label="Qualification" 
+                name="qualification" 
+                value={providerData.qualification} 
+                onChange={handleProviderChange} 
+                required 
+                placeholder="Your highest qualification" 
+              />
 
-            <Input 
-              label="Specialization" 
-              name="specialization" 
-              value={providerData.specialization} 
-              onChange={handleProviderChange} 
-              required 
-              placeholder="Your area of specialization" 
-            />
+              <Input 
+                label="Specialization" 
+                name="specialization" 
+                value={providerData.specialization} 
+                onChange={handleProviderChange} 
+                required 
+                placeholder="Your area of specialization" 
+              />
 
-            <Input 
-              label="Availability" 
-              name="availability" 
-              value={providerData.availability} 
-              onChange={handleProviderChange} 
-              required 
-              placeholder="Your working hours/days" 
-            />
+              <Input 
+                label="Availability" 
+                name="availability" 
+                value={providerData.availability} 
+                onChange={handleProviderChange} 
+                required 
+                placeholder="Your working hours/days" 
+              />
 
-            <Input 
-              label="Expected Salary" 
-              name="expectedSalary" 
-              type="number" 
-              value={providerData.expectedSalary} 
-              onChange={handleProviderChange} 
-              required 
-              placeholder="Expected monthly salary" 
-            />
+              <Input 
+                label="Expected Salary" 
+                name="expectedSalary" 
+                type="number" 
+                value={providerData.expectedSalary} 
+                onChange={handleProviderChange} 
+                required 
+                placeholder="Expected monthly salary" 
+              />
+            </div>
+
+            {/* Right Column - Image Upload */}
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                {providerImagePreview ? (
+                  <div className="relative">
+                    <Image
+                      src={providerImagePreview}
+                      alt="Preview"
+                      width={200}
+                      height={200}
+                      className="max-h-[200px] mx-auto rounded-lg object-contain"
+                      unoptimized
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProviderData(prev => ({ ...prev, image: null }));
+                        setProviderImagePreview(null);
+                      }}
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && file.size <= 10 * 1024 * 1024) {
+                          handleProviderImageChange(e);
+                        } else {
+                          toast.error("File size must be less than 10MB");
+                        }
+                      }}
+                      className="hidden"
+                      id="provider-image-upload"
+                    />
+                    <label
+                      htmlFor="provider-image-upload"
+                      className="cursor-pointer flex flex-col items-center space-y-2"
+                    >
+                      <div className="p-2 rounded-full bg-gray-100">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-gray-500">Upload your photo</span>
+                      <span className="text-xs text-gray-400">PNG, JPG up to 10MB</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <DialogFooter>
-            <Button onClick={handleProviderSubmit}>
+            <Button onClick={handleProviderSubmit} disabled={!providerData.image}>
               Submit Registration
             </Button>
           </DialogFooter>
