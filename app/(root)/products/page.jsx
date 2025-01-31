@@ -517,9 +517,7 @@ useEffect(() => {
 
 const handleDownload = () => {
   // Sample file URL
-  const fileUrl = "/samplesheet.xlsx"; // Assuming the file is in your public folder
-
-  // Create a temporary anchor element
+  const fileUrl = "/samplesheet.xlsx"; 
   const link = document.createElement("a");
   link.href = fileUrl;
   link.download = "../../../public/samplesheet.xlsx";
