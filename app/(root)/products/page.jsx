@@ -58,6 +58,8 @@ import {
 } from "@/components/ui/carousel";
 import { useRouter } from "next/navigation"; // Add this import
 import Image from "next/image"; // Add this import
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const ProductTable = ({ data, columns, onEdit }) => {
   const [search, setSearch] = useState("title");
@@ -432,9 +434,21 @@ export default function ProductPage() {
   
 
 const handleEdit = (product) => {
-  console.log(product)
   setSelectedProduct(product);
   setModalOpen(true);
+  setTitle(product.title || "");
+  setCategory(product.category || "");
+  setSubCategory(product.subCategory || "");
+  setMaxRetailPrice(product.maxRetailPrice || "");
+  setMinOrderQty(product.minOrderQty || "");
+  setSellingPrice(product.sellingPrice || "");
+  setDescription(product.description || "");
+  setMaterial(product.material || "");
+  setSize(product.size || "");
+  setDispatchDays(product.dispatchDays || "");
+  setWarranty(product.warranty || "");
+  setImagePreviews(product.images || []);
+  setImages(product.images || []);
 };
 
 
@@ -456,23 +470,37 @@ const handleUpdate = async () => {
         return ;
       }
       setLoading(true)
-      const response = await fetch('/api/products/updateProduct', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: selectedProduct.productId,
-          data: selectedProduct,
-        }),
-      });
+      let finalImages =
+        images.length > 0
+          ? await handleUpload(userId, selectedProduct.productId)
+          : selectedProduct.images;
 
-      const result = await response.json();
-      if (response.ok) {
-        setModalOpen(false);
-        fetchProducts();
-        console.log(result.message);
-      } else {
-        console.error(result.error);
-      }
+      await setDoc(
+        doc(db, 'products', selectedProduct.productId),
+        {
+          title,
+          category,
+          subCategory,
+          maxRetailPrice,
+          description,
+          minOrderQty,
+          sellingPrice,
+          dispatchDays,
+          size,
+          material,
+          warranty,
+          images: finalImages,
+          updatedAt: new Date(),
+          status: selectedProduct.status || 'disabled',
+        },
+        { merge: true }
+      );
+
+      setModalOpen(false);
+      setShowProducts('My Products');
+      setActiveSection('My Products');
+      fetchProducts();
+      console.log('Product updated successfully');
     } catch (error) {
       console.error('Error updating product:', error);
     } finally {
@@ -481,39 +509,6 @@ const handleUpdate = async () => {
   }
 };
 
-
-useEffect(() => {
-  if (selectedProduct) {
-    setTitle(selectedProduct.title || "");
-    setCategory(selectedProduct.category || "");
-    setSubCategory(selectedProduct.subCategory || "");
-    setMaxRetailPrice(selectedProduct.maxRetailPrice || "");
-    setMinOrderQty(selectedProduct.minOrderQty || "");
-    setSellingPrice(selectedProduct.sellingPrice || "");
-    setDescription(selectedProduct.description || "");
-    setMaterial(selectedProduct.material || "");
-    setSize(selectedProduct.size || "");
-    setDispatchDays(selectedProduct.dispatchDays || "");
-    setWarranty(selectedProduct.warranty || "");
-    setImagePreviews(selectedProduct.images || []);
-    setImages(selectedProduct.images || []);
-    console.log(selectedProduct.images)
-  }else {
-    setTitle("");
-    setCategory("");
-    setSubCategory("");
-    setMaxRetailPrice("");
-    setMinOrderQty("");
-    setSellingPrice("");
-    setDescription("");
-    setMaterial("");
-    setSize("");
-    setDispatchDays("");
-    setWarranty("");
-    setImagePreviews([]);
-    setImages([]);
-  }
-}, [selectedProduct]);
 
 const handleDownload = () => {
   // Sample file URL
@@ -599,6 +594,35 @@ const handleFileUpload = (event) => {
       return;
     }
 
+    // For each row, create a product entry in db
+    camelCaseData.forEach(async (row) => {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const generatedId = `PID${timestamp}`;
+      await setDoc(
+        doc(db, "products", generatedId),
+        {
+          title: row.title || "",
+          category: row.category || "",
+          subCategory: row.subCategory || "",
+          maxRetailPrice: row.maxRetailPrice || "",
+          description: row.description || "",
+          minOrderQty: row.minOrderQty || "",
+          sellingPrice: row.sellingPrice || "",
+          dispatchDays: row.daysofDispatch || "",
+          size: row.size || "",
+          material: row.material || "",
+          warranty: row.warranty || "",
+          // images: imagesURL, // Provide image logic if needed
+          productId: generatedId,
+          vendorId: userId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          status: "disabled",
+        },
+        { merge: true }
+      );
+    });
+
     setData(camelCaseData);
     console.log(camelCaseData);
     setOpen("bulkUploadForm");
@@ -608,7 +632,7 @@ const handleFileUpload = (event) => {
   };
 
   reader.readAsBinaryString(file);
-};
+}
 
   const columns = useMemo(
     () => [
