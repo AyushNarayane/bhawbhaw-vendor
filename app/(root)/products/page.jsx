@@ -424,12 +424,22 @@ export default function ProductPage() {
   }, [showProducts, userId]);
 
   useEffect(() => {
-    const filtered = products.filter((product) =>
-      product.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      product.status === productStatus
-    );
+    const filtered = products.filter((product) => {
+      // Handle null/undefined product
+      if (!product) return false;
+      
+      // Handle null/undefined/non-string title
+      const productTitle = String(product?.title || '');
+      const searchQuery = String(searchTerm || '');
+      
+      return (
+        productTitle.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        product?.status === productStatus
+      );
+    });
+    
     setFilteredProducts(filtered);
-  }, [productStatus, products]);
+  }, [productStatus, products, searchTerm]);
 
   
 
