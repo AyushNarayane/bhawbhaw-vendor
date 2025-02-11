@@ -537,112 +537,103 @@ const handleFileUpload = (event) => {
 
   const reader = new FileReader();
 
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     const binaryStr = e.target?.result;
     if (typeof binaryStr !== "string") return;
 
     const workbook = XLSX.read(binaryStr, { type: "binary" });
-
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const sheetData = XLSX.utils.sheet_to_json(sheet);
 
-    const camelCaseData = sheetData.map((row) => {
-      const camelCaseRow = {};
-      Object.keys(row).forEach((key) => {
-        const camelCaseKey = key
-          .replace(/[^a-zA-Z]/g, "")
-          .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
-            return index === 0 ? word.toLowerCase() : word.toUpperCase();
-          });
+    // Map Excel headers to database field names
+    const fieldMapping = {
+      'Title': 'title',
+      'Category': 'category',
+      'Sub Category': 'subCategory',
+      'Maximum Retail Price': 'maxRetailPrice',
+      'Minimum Order Quantity': 'minOrderQty',
+      'Selling Price': 'sellingPrice',
+      'Description': 'description',
+      'MATERIAL': 'material',
+      'Size': 'size',
+      'Days of Dispatch': 'dispatchDays',
+      'Warranty (optional)': 'warranty'
+    };
 
-        if (camelCaseKey === "targetedGender") {
-          camelCaseRow[camelCaseKey] = [row[key]];
-        } else {
-          camelCaseRow[camelCaseKey] = row[key];
-        }
+    // Transform the data using the mapping
+    const transformedData = sheetData.map((row) => {
+      const transformedRow = {};
+      Object.entries(fieldMapping).forEach(([excelHeader, dbField]) => {
+        transformedRow[dbField] = row[excelHeader] || '';
       });
-
-      return camelCaseRow;
+      return transformedRow;
     });
 
+    // Validate required fields
     const requiredFields = [
-      "grossWeightIngm",
-      "gstPercentage",
-      "reportNumber",
-      "finalPrice",
-      "title",
-      "size",
-      "numberofDiamonds",
-      "grossWeightIngm",
-      "netWeightIngm",
-      "metal",
-      "makingCharges",
-      "gstCharges",
-      "goldPurity",
-      "goldPricePergm",
-      "targetedGender",
-      "daysofDispatch",
-      "diamondWeightInCarat",
-      "diamondPricePerCarat",
-      "diamondColor",
-      "description",
-      "category",
+      'title',
+      'category',
+      'subCategory',
+      'maxRetailPrice',
+      'minOrderQty',
+      'sellingPrice',
+      'description',
+      'material',
+      'size',
+      'dispatchDays'
     ];
-    const isValid = camelCaseData.every((row) =>
-      requiredFields.every(
-        (field) =>
-          row[field] !== undefined && row[field] !== null && row[field] !== ""
-      )
+
+    const isValid = transformedData.every((row) =>
+      requiredFields.every((field) => {
+        const value = row[field];
+        return value !== undefined && value !== null && value !== '';
+      })
     );
 
     if (!isValid) {
-      toast.error("Error: Some required fields are missing.");
+      toast.error("Error: Please ensure all required fields are filled in the Excel file.");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       return;
     }
 
-    // For each row, create a product entry in db
-    camelCaseData.forEach(async (row) => {
-      const timestamp = Math.floor(Date.now() / 1000);
-      const generatedId = `PID${timestamp}`;
-      await setDoc(
-        doc(db, "products", generatedId),
-        {
-          title: row.title || "",
-          category: row.category || "",
-          subCategory: row.subCategory || "",
-          maxRetailPrice: row.maxRetailPrice || "",
-          description: row.description || "",
-          minOrderQty: row.minOrderQty || "",
-          sellingPrice: row.sellingPrice || "",
-          dispatchDays: row.daysofDispatch || "",
-          size: row.size || "",
-          material: row.material || "",
-          warranty: row.warranty || "",
-          // images: imagesURL, // Provide image logic if needed
-          productId: generatedId,
-          vendorId: userId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          status: "disabled",
-        },
-        { merge: true }
-      );
-    });
+    try {
+      // Upload data to Firestore
+      for (const row of transformedData) {
+        const timestamp = Math.floor(Date.now() / 1000);
+        const generatedId = `PID${timestamp}`;
+        
+        await setDoc(
+          doc(db, "products", generatedId),
+          {
+            ...row,
+            productId: generatedId,
+            vendorId: userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            status: "disabled",
+          },
+          { merge: true }
+        );
+      }
 
-    setData(camelCaseData);
-    console.log(camelCaseData);
-    setOpen("bulkUploadForm");
+      setData(transformedData);
+      setOpen("bulkUploadForm");
+      toast.success("Products uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading products:", error);
+      toast.error("Failed to upload products. Please try again.");
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
   reader.readAsBinaryString(file);
-}
+};
 
   const columns = useMemo(
     () => [
@@ -929,7 +920,6 @@ const handleFileUpload = (event) => {
                           </Select>
                         </div>
 
-                        {/* Sub Category */}
                         <div>
                           <label className="text-sm text-[#C5A88F]" htmlFor="category">
                             Sub Category

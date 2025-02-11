@@ -32,6 +32,8 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebase";
 import Protected from "@/components/Protected/Protected";
 import Image from "next/image";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/firebase";
 
 const ServiceTable = ({ data, columns, onEdit, onDelete }) => {
   const [search, setSearch] = useState("serviceName");
@@ -216,12 +218,15 @@ const ServiceTable = ({ data, columns, onEdit, onDelete }) => {
 const AddServicePage = () => {
   const { currentUser } = useAuth();
   const [serviceData, setServiceData] = useState({
-    address: "",
-    phoneNumber: "",
-    pricePerHour: "",
     serviceName: "",
-    title: "",
+    serviceDetails: "",
+    timeSlots: "",
+    sessionCharges: "",
+    sessionTiming: "",
+    monthlyCharges: "",
+    certification: null,
     image: null,
+    teamMember: ""
   });
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -244,6 +249,7 @@ const AddServicePage = () => {
   });
   const [providerImagePreview, setProviderImagePreview] = useState(null);
   const [providerStatus, setProviderStatus] = useState(null);
+  const [teamMembers, setTeamMembers] = useState([]);
 
   const fetchServices = async () => {
     try {
@@ -259,9 +265,35 @@ const AddServicePage = () => {
     }
   };
 
+  const fetchTeamMembers = async () => {
+    try {
+      const teamsQuery = query(
+        collection(db, "team-vendor"),
+        where("vendorId", "==", currentUser.id)
+      );
+
+      const querySnapshot = await getDocs(teamsQuery);
+      const teamMembers = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name,
+          role: data.role,
+          // Add any other fields you need from the team-vendor document
+        };
+      });
+
+      setTeamMembers(teamMembers);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      toast.error("Failed to fetch team members");
+    }
+  };
+
   useEffect(() => {
     if (currentUser?.id) {
       fetchServices();
+      fetchTeamMembers(); // Add this if not already present
     }
   }, [currentUser]);
 
@@ -292,6 +324,15 @@ const AddServicePage = () => {
     const file = e.target.files[0];
     setServiceData((prev) => ({ ...prev, image: file }));
     setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleCertificationChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setServiceData(prev => ({ ...prev, certification: file }));
+    } else {
+      toast.error("Please upload a PDF file");
+    }
   };
 
   const handleEdit = (service) => { 
@@ -491,31 +532,63 @@ const AddServicePage = () => {
         accessorKey: "serviceName",
       },
       {
-        header: "Title",
-        accessorKey: "title",
+        header: "Details",
+        accessorKey: "serviceDetails",
+        cell: ({ row }) => (
+          <div className="max-w-[200px] truncate" title={row.original.serviceDetails}>
+            {row.original.serviceDetails}
+          </div>
+        ),
       },
       {
-        header: "Price Per Hour",
-        accessorKey: "pricePerHour",
+        header: "Time Slots",
+        accessorKey: "timeSlots",
       },
       {
-        header: "Phone Number",
-        accessorKey: "phoneNumber",
+        header: "Session Info",
+        cell: ({ row }) => (
+          <div className="space-y-1">
+            <div>₹{row.original.sessionCharges} per session</div>
+            <div className="text-sm text-gray-500">{row.original.sessionTiming} mins</div>
+          </div>
+        ),
       },
       {
-        header: "Address",
-        accessorKey: "address",
+        header: "Monthly Charges",
+        accessorKey: "monthlyCharges",
+        cell: ({ row }) => (
+          <div>
+            {row.original.monthlyCharges ? `₹${row.original.monthlyCharges}` : '-'}
+          </div>
+        ),
+      },
+      {
+        header: "Team Member",
+        accessorKey: "teamMember",
+        cell: ({ row }) => {
+          const member = teamMembers.find(m => m.id === row.original.teamMember);
+          return member ? (
+            <div className="space-y-1">
+              <div>{member.name}</div>
+              <div className="text-sm text-gray-500">{member.role}</div>
+            </div>
+          ) : '-';
+        },
       },
       {
         header: "Image",
         cell: ({ row }) => (
           row.original.image && row.original.image[0] && (
-            <img src={row.original.image[0]} alt="Service" width="50" height="50" />
+            <img 
+              src={row.original.image[0]} 
+              alt="Service" 
+              className="w-12 h-12 object-cover rounded-lg"
+            />
           )
         ),
       },
     ],
-    []
+    [teamMembers] // Add teamMembers as dependency since we're using it in the cell render
   );
 
   return (
@@ -564,77 +637,149 @@ const AddServicePage = () => {
         </div>
       </div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-white">
+        <DialogContent className="bg-white max-w-3xl">
           <DialogHeader>
             <DialogTitle>{isEditMode ? "Edit Service" : "Add New Service"}</DialogTitle>
-            <DialogDescription>Enter service details and upload an image.</DialogDescription>
+            <DialogDescription>Enter service details and required documentation.</DialogDescription>
           </DialogHeader>
-          <Input 
-            label="Service Name" 
-            name="serviceName" 
-            value={serviceData.serviceName} 
-            onChange={handleChange} 
-            required 
-            placeholder="Enter the service name" 
-          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <h3 className="font-semibold">Service Information</h3>
+              
+              <Input 
+                label="Service Name" 
+                name="serviceName" 
+                value={serviceData.serviceName} 
+                onChange={handleChange} 
+                required 
+                placeholder="Enter service name" 
+              />
 
-          <Input 
-            label="Title" 
-            name="title" 
-            value={serviceData.title} 
-            onChange={handleChange} 
-            required 
-            placeholder="Enter the title" 
-          />
+              <textarea
+                name="serviceDetails"
+                value={serviceData.serviceDetails}
+                onChange={handleChange}
+                placeholder="Enter service details"
+                className="w-full p-2 border rounded-md"
+                rows={3}
+              />
 
-          <Input 
-            label="Address" 
-            name="address" 
-            value={serviceData.address} 
-            onChange={handleChange} 
-            required 
-            placeholder="Enter the address" 
-          />
+              <Input 
+                label="Time Slots" 
+                name="timeSlots" 
+                value={serviceData.timeSlots} 
+                onChange={handleChange} 
+                required 
+                placeholder="Available time slots" 
+              />
 
-          <Input 
-            label="Phone Number" 
-            name="phoneNumber" 
-            value={serviceData.phoneNumber} 
-            onChange={handleChange} 
-            required 
-            placeholder="Enter the phone number" 
-          />
+              <Input 
+                label="Per Session Charges (₹)" 
+                name="sessionCharges" 
+                type="number" 
+                value={serviceData.sessionCharges} 
+                onChange={handleChange} 
+                required 
+                placeholder="Enter charges per session" 
+              />
 
-          <Input 
-            label="Price Per Hour" 
-            name="pricePerHour" 
-            type="number" 
-            value={serviceData.pricePerHour} 
-            onChange={handleChange} 
-            required 
-            placeholder="Enter the price per hour" 
-          />
+              <Input 
+                label="Session Timing (minutes)" 
+                name="sessionTiming" 
+                value={serviceData.sessionTiming} 
+                onChange={handleChange} 
+                required 
+                placeholder="e.g., 45" 
+              />
 
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleImageChange} 
-            placeholder="Upload an image" 
-          />
+              <Input 
+                label="Monthly Charges (₹)" 
+                name="monthlyCharges" 
+                type="number" 
+                value={serviceData.monthlyCharges} 
+                onChange={handleChange} 
+                placeholder="Optional: Enter monthly charges" 
+              />
 
-          {imagePreview && <img src={imagePreview} alt="Preview" width="50" height="50" className="mt-2" />}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Team Member</label>
+                <Select
+                  name="teamMember"
+                  value={serviceData.teamMember}
+                  onValueChange={(value) => 
+                    setServiceData(prev => ({ ...prev, teamMember: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select team member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teamMembers.map((member) => (
+                      <SelectItem 
+                        key={member.id} 
+                        value={member.id}
+                        className="capitalize"
+                      >
+                        {member.name} - {member.role}
+                      </SelectItem>
+                    ))}
+                    {teamMembers.length === 0 && (
+                      <SelectItem value="none" disabled>
+                        No team members available
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                {teamMembers.length === 0 && (
+                  <p className="text-sm text-gray-500">
+                    Add team members in the Team Management section first
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Documentation & Media</h3>
+              
+              <div className="border-2 border-dashed p-4 rounded-lg">
+                <label className="block mb-2">Certification (PDF)</label>
+                <input 
+                  type="file" 
+                  accept=".pdf" 
+                  onChange={handleCertificationChange} 
+                  className="w-full"
+                />
+                <p className="text-sm text-gray-500 mt-1">Optional: Upload certification document</p>
+              </div>
+
+              <div className="border-2 border-dashed p-4 rounded-lg">
+                <label className="block mb-2">Service Photo</label>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleImageChange} 
+                  required={!isEditMode}
+                  className="w-full"
+                />
+                {imagePreview && (
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="mt-2 max-h-40 object-contain" 
+                  />
+                )}
+              </div>
+            </div>
+          </div>
 
           <DialogFooter>
             <Button onClick={handleSubmit} disabled={loading}>
               {loading ? "Submitting..." : isEditMode ? "Save Changes" : "Submit"}
             </Button>
           </DialogFooter>
-
-      
-      
         </DialogContent>
       </Dialog>
-
 
       <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <DialogContent className="bg-white">
