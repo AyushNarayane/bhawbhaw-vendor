@@ -62,15 +62,15 @@ export default function HomePage() {
                 </nav>
 
                 <div className='flex gap-5'>
-                    <button 
-                        className="hidden md:block bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" 
+                    <button
+                        className="hidden md:block bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4"
                         onClick={() => router.push('/dashboard')}
                     >
                         Dashboard
                     </button>
                     {!currentUser && (
-                        <button 
-                            className="hidden md:block bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" 
+                        <button
+                            className="hidden md:block bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4"
                             onClick={() => router.push('/signup')}
                         >
                             Become a Seller
@@ -92,15 +92,15 @@ export default function HomePage() {
                         <button onClick={() => handleMenuItemClick('howItWorks')} className="text-gray-700 hover:text-black transition">How It Works</button>
                         <button onClick={() => handleMenuItemClick('services')} className="text-gray-700 hover:text-black transition">Services</button>
                         <button onClick={() => handleMenuItemClick('highlight')} className="text-gray-700 hover:text-black transition">Highlight</button>
-                        <button 
-                            className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" 
+                        <button
+                            className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4"
                             onClick={() => router.push('/dashboard')}
                         >
                             Dashboard
                         </button>
                         {!currentUser && (
-                            <button 
-                                className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4" 
+                            <button
+                                className="bg-baw-baw-g3 text-white py-2 px-4 rounded-md hover:bg-baw-baw-g4"
                                 onClick={() => { router.push('/signup'); setMenuOpen(false); }}
                             >
                                 Become a Seller
@@ -112,14 +112,28 @@ export default function HomePage() {
 
             <div className="flex max-w-6xl mx-auto flex-col md:flex-row justify-start items-center w-full min-h-[80vh] px-5 pe-0 md:px-0 pt-10 md:pt-0">
                 <div className="relative w-full md:w-3/6 md:ml-10 mb-10 md:mb-0">
-                    <Image src='/cat.png' width="400" height="400" className='mx-auto w-auto' />
+                    <Image
+                        src='/cat.png'
+                        width={400}
+                        height={400}
+                        className='mx-auto w-[300px] h-[400px] md:w-[430px] md:h-[500px]'
+                        alt="Cat Image"
+                    />
                 </div>
 
+
                 <div className="w-full md:text-left text-center max-w-xl md:w-1/2 pe-10 md:px-10 relative mx-auto md:pl-20">
-                    <h1 className="text-2xl lg:text-5xl md:text-4xl sm:text-3xl !leading-tight font-extrabold text-black mb-4 md:mb-6">
-                        <Image width="300" height="300" src='/glitterR.png' className='absolute right-0 w-8 md:w-11' />
+                    <h1 className="text-2xl lg:text-5xl md:text-4xl sm:text-3xl !leading-tight font-extrabold text-black mb-4 md:mb-6 relative">
+                        <Image
+                            width="300"
+                            height="300"
+                            src='/glitterR.png'
+                            className='absolute right-0 w-12 md:w-16'
+                            alt="Decorative glitter"
+                        />
                         Connecting Pet Sellers with Pet Lovers <br /> Everywhere
                     </h1>
+
                     <p className="text-sm md:text-md text-gray-600 mb-4 md:mb-6 pr-0 md:pr-24">
                         Sell pet products, offer services, and grow your business with ease.
                     </p>

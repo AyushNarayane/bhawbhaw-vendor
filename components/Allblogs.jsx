@@ -1,17 +1,40 @@
 'use client';
 
-// AllBlogs.js
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import BlogCard from './Blogcard';
 import Navigation from './Navigation';
 import Header from './Header/Header';
 import Image from 'next/image';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const AllBlogs = () => {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const blogsCollection = collection(db, 'blogs');
+        const blogsSnapshot = await getDocs(blogsCollection);
+        const blogsData = blogsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setBlogPosts(blogsData);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
 
   const handleMenuItemClick = (section) => {
     handleScrollToSection(section);
@@ -33,64 +56,6 @@ const AllBlogs = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Blog data array
-  const blogPosts = [
-    {
-      title: "Starting your new friendship off on the right paw",
-      category: "ADOPTING A PET",
-      date: "5.12.2024",
-      image: "/blogs/blog1.png", // Replace with actual image path
-    },
-    {
-      title: "Your guide to pet care essentials",
-      category: "PET CARE",
-      date: "8.12.2024",
-      image: "/blogs/blog2.png", // Replace with actual image path
-    },
-    {
-      title: "Choosing the right food for your pet",
-      category: "PET NUTRITION",
-      date: "9.13.2024",
-      image: "/blogs/blog3.png", // Replace with actual image path
-    },
-    {
-      title: "Tips for a happy pet",
-      category: "PET CARE",
-      date: "10.14.2024",
-      image: "/blogs/blog1.png", // Replace with actual image path
-    },
-    {
-      title: "Your guide to pet care essentials",
-      category: "PET CARE",
-      date: "8.12.2024",
-      image: "/blogs/blog2.png", // Replace with actual image path
-    },
-    {
-      title: "Choosing the right food for your pet",
-      category: "PET NUTRITION",
-      date: "9.13.2024",
-      image: "/blogs/blog3.png", // Replace with actual image path
-    },
-    {
-      title: "Tips for a happy pet",
-      category: "PET CARE",
-      date: "10.14.2024",
-      image: "/blogs/blog1.png", // Replace with actual image path
-    },
-    {
-      title: "Your guide to pet care essentials",
-      category: "PET CARE",
-      date: "8.12.2024",
-      image: "/blogs/blog2.png", // Replace with actual image path
-    },
-    {
-      title: "Choosing the right food for your pet",
-      category: "PET NUTRITION",
-      date: "9.13.2024",
-      image: "/blogs/blog3.png", // Replace with actual image path
-    },
-  ];
 
   return (
     <div className='-mt-20'>
@@ -158,17 +123,27 @@ const AllBlogs = () => {
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-medium text-[#4D413E]">Latest blog posts</h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogPosts.map((post, index) => (
-          <BlogCard
-            key={index}
-            title={post.title}
-            category={post.category}
-            date={post.date}
-            image={post.image}
-          />
-        ))}
-      </div>
+      {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4D413E]"></div>
+          </div>
+        ) : blogPosts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {blogPosts.map((post) => (
+              <BlogCard
+                key={post.id}
+                title={post.title}
+                category={post.category}
+                date={new Date(post.createdAt?.seconds * 1000).toLocaleDateString()}
+                image={post.image || '/blogs/default-blog.png'}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-gray-500 py-12">
+            No blog posts available at the moment.
+          </div>
+        )}
     </div>
     </div>
   );

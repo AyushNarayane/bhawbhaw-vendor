@@ -690,7 +690,7 @@ const AddServicePage = () => {
                 value={serviceData.sessionTiming} 
                 onChange={handleChange} 
                 required 
-                placeholder="e.g., 45" 
+                placeholder="Session Timing: (e.g., 45 minutes)" 
               />
 
               <Input 
