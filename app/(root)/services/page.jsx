@@ -301,7 +301,7 @@ const AddServicePage = () => {
     const fetchProviderStatus = async () => {
       if (currentUser?.id) {
         try {
-          const response = await fetch(`/api/serviceprovider/status?vendorId=${currentUser.id}`);
+          const response = await fetch(`/api/serviceProvider/status?vendorId=${currentUser.id}`);
           if (response.ok) {
             const data = await response.json();
             setProviderStatus(data.status);

@@ -72,7 +72,7 @@ const Header = () => {
 
       <div className="flex justify-end lg:flex-1">
         <div className="lg:flex gap-5 items-center hidden relative" ref={dropdownRef}>
-          <Image src={Noti} width={25} height={25} alt="Notification" />
+          {/* <Image src={Noti} width={25} height={25} alt="Notification" /> */}
           <div className="flex gap-3 items-center cursor-pointer" onClick={toggleDropdown}>
             <h1 className="font-semibold">Hello {currentUser?.personalDetails?.name}!!</h1>
             <Image src={currentUser?.documents?.photo} height={40} width={40} alt="Profile" className="h-10 w-10 max-h-10 rounded-full" />
