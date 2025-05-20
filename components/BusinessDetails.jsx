@@ -12,6 +12,8 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
     pinCode: "",
     city: "",
     state: "",
+    latitude: "",
+    longitude: "",
   }); 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [focusedField, setFocusedField] = useState("");
@@ -281,23 +283,55 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
       </div>
 
       <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
-  <div>
-    <input
-      type="text"
-      name="gstNumber"
-      value={formData.gstNumber}
-      onChange={handleChange}
-      onFocus={() => handleFocus("gstNumber")}
-      onBlur={handleBlur}
-      className={`w-full p-3 sm:text-md text-sm border-b ${
-        focusedField === "gstNumber" ? "border-gray-100" : "border-gray-300"
-      } mt-1`}
-      placeholder="GST Number (if applicable)"
-    />
-  </div>
-</div>
+        <div>
+          <input
+            type="text"
+            name="gstNumber"
+            value={formData.gstNumber}
+            onChange={handleChange}
+            onFocus={() => handleFocus("gstNumber")}
+            onBlur={handleBlur}
+            className={`w-full p-3 sm:text-md text-sm border-b ${
+              focusedField === "gstNumber" ? "border-gray-100" : "border-gray-300"
+            } mt-1`}
+            placeholder="GST Number (if applicable)"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:gap-14 gap-5 mb-4">
+        <div>
+          <input
+            type="text"
+            name="latitude"
+            value={formData.latitude}
+            onChange={handleChange}
+            onFocus={() => handleFocus("latitude")}
+            onBlur={handleBlur}
+            className={`w-full p-3 sm:text-md text-sm border-b ${
+              focusedField === "latitude" ? "border-gray-100" : "border-gray-300"
+            } mt-1`}
+            placeholder="Latitude"
+          />
+        </div>
+        <div>
+          <input
+            type="text"
+            name="longitude"
+            value={formData.longitude}
+            onChange={handleChange}
+            onFocus={() => handleFocus("longitude")}
+            onBlur={handleBlur}
+            className={`w-full p-3 sm:text-md text-sm border-b ${
+              focusedField === "longitude" ? "border-gray-100" : "border-gray-300"
+            } mt-1`}
+            placeholder="Longitude"
+          />
+        </div>
+      </div>
+
       <div className="flex justify-between mt-6">
-      <button
+        <button
           className="px-4 py-2 bg-gray-300 rounded xs:text-sm text-xs"
           onClick={prevStep}
         >
@@ -309,9 +343,7 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
         >
           Proceed to Bank Details
         </button>
-       
       </div>
-
     </div>
   );
 };
