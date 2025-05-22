@@ -58,9 +58,20 @@ const SignInForm = () => {
       const userData = userDoc.data();
       const status = userData.status;
 
-      if (!status == "verified") {
-        toast.error("Your account is pending verification. Please wait for admin approval.");
+      // Check for different status values and provide specific error messages
+      if (status !== "verified") {
         await auth.signOut(); // Sign out if not verified
+        
+        if (status === "unverified") {
+          toast.error("Your account is not verified. Please wait for verification or contact admin.");
+        } else if (status === "initiated") {
+          toast.error("Your account setup is initiated but not complete. Please wait for the process to complete.");
+        } else if (status === "disabled") {
+          toast.error("Your account has been disabled. Please contact admin for assistance.");
+        } else {
+          toast.error("Your account is pending verification. Please wait for admin approval.");
+        }
+        
         setLoading(false);
         return;
       }
