@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { db } from '@/firebase';
-import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 
 const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const [formData, setFormData] = useState({
@@ -108,7 +108,7 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
           password: password // Add password to the document
         },
         status: 'initiated',
-        createdAt: new Date().toISOString(),
+        createdAt: serverTimestamp(),
         id: userId
       }, { merge: true });
 
