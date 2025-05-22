@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { db } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
   const [formData, setFormData] = useState({
@@ -86,6 +86,17 @@ const PersonalDetails = ({ nextStep, data, setData, userId, setUid }) => {
     try {
       setIsSubmitted(true);
       setLoading(true);
+
+      // Check if the email is already in use
+      const vendorsRef = collection(db, 'vendors');
+      const emailQuery = query(vendorsRef, where("personalDetails.email", "==", email));
+      const querySnapshot = await getDocs(emailQuery);
+      
+      if (!querySnapshot.empty) {
+        toast.error("This email is already in use. Please use a different email.");
+        setLoading(false);
+        return;
+      }
 
       // Save to Firestore with password
       const vendorRef = doc(db, 'vendors', userId);
