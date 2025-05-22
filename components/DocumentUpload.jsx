@@ -91,11 +91,14 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
                 }
             }
 
+            // Update state with URLs
+            setData({ ...urls });
+            
+            // Call onSubmit after uploading and updating state
             if (typeof onSubmit === 'function') {
                 await onSubmit();
             }
-
-            setData({ ...urls });
+            
             setUploading(false);
             
         } catch (error) {
@@ -142,10 +145,11 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
                                 accept="image/*,application/pdf"
                                 hidden
                                 onChange={(e) => handleFileChange(e, documentType)}
+                                disabled={uploading}
                             />
                         </label>
 
-                        {previews[documentType] && (
+                        {previews[documentType] && !uploading && (
                             <AiOutlineClose
                                 size={20}
                                 className="absolute top-0 right-0 border border-red-500 rounded-full p-1 cursor-pointer text-red-500"
@@ -187,10 +191,11 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
                                 accept="image/*,application/pdf"
                                 hidden
                                 onChange={(e) => handleFileChange(e, "gstCertificate")}
+                                disabled={uploading}
                             />
                         </label>
 
-                        {previews.gstCertificate && (
+                        {previews.gstCertificate && !uploading && (
                             <AiOutlineClose
                                 size={20}
                                 className="absolute top-0 right-0 border border-red-500 rounded-full p-1 cursor-pointer text-red-500"
@@ -204,7 +209,8 @@ const DocumentUploadForm = ({ prevStep, data, onSubmit, setData, userId, isEcomm
             <div className="flex justify-between mt-6">
                 <button
                     onClick={prevStep}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors duration-200"
+                    disabled={uploading}
+                    className={`px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors duration-200 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     Back
                 </button>

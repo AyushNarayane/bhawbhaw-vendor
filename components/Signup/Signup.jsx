@@ -95,7 +95,7 @@ const MultiStepForm = () => {
 
       // Show success dialog
       setShowSuccessDialog(true);
-      toast.success('Account created successfully! Please sign in.');
+      toast.success('Our team will verify and send you a confirmation email');
 
     } catch (error) {
       console.error('Error submitting data:', error);
@@ -163,15 +163,15 @@ const MultiStepForm = () => {
               </div>
             </div>
             <h2 className="text-2xl font-semibold mb-4">Account Created Successfully!</h2>
-            <p className="text-gray-600 mb-6">Your account has been created. Please sign in to continue.</p>
+            <p className="text-gray-600 mb-6">Our team will verify and confirm your email.</p>
             <button
               onClick={() => {
                 setShowSuccessDialog(false);
-                router.push('/signin');
+                router.push('/');
               }}
               className="w-full bg-[#85716B] text-white py-3 rounded-lg hover:bg-[#726159] transition-colors"
             >
-              Proceed to Sign In
+              Proceed to Homepage
             </button>
           </div>
         </div>
