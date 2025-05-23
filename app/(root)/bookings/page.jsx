@@ -63,7 +63,7 @@ const BookingTable = ({ data, columns, onView, onChangeStatus, onAssign }) => {
           {/* ... existing dropdown menu code ... */}
         </DropdownMenu>
       </div>
-      <div className="rounded-lg shadow-md shadow-md w-full max-w-[95vw] overflow-x-auto">
+      <div className="rounded-lg shadow-md w-full max-w-[95vw] overflow-x-auto">
         <Table className="border-none  min-w-[800px]">
           <TableHeader className="min-w-10">
             {table.getHeaderGroups().map((headerGroup) => (
