@@ -352,7 +352,22 @@ const CouponsPage = () => {
                       id="couponTitle"
                       placeholder="Coupon Name"
                       value={couponTitle}
-                      onChange={(e) => setCouponTitle(e.target.value)}
+                      onChange={(e) => {
+                        const typedValue = e.target.value;
+                        let newCouponTitle = typedValue.toUpperCase();
+                  
+                        // Regex allows:
+                        // - Empty string
+                        // - Up to 4 uppercase letters (e.g., A, AB, ABC, ABCD)
+                        // - Exactly 4 uppercase letters followed by up to 2 digits (e.g., ABCD1, ABCD12)
+                        const isValidPartial = /^[A-Z]{0,4}$|^[A-Z]{4}\d{0,2}$/.test(newCouponTitle);
+                  
+                        if (newCouponTitle === "" || isValidPartial) {
+                          setCouponTitle(newCouponTitle);
+                        }
+                        // If not valid, the input effectively ignores the last typed character 
+                        // that made it invalid.
+                      }}
                       className="bg-zinc-100"
                     />
                     {error && <span className="text-red-500 text-start w-full text-[10px]">{error}</span>}
@@ -388,7 +403,7 @@ const CouponsPage = () => {
                     className="bg-baw-baw-g3 text-white"
                     onClick={async () => {
                       if (!isValidCouponTitle(couponTitle)) {
-                        setError("Coupon name must have 4 uppercase letters and 2 digits.");
+                        setError("Coupon name must have 4 uppercase letters followed by two digits eg. HELO25.");
                         return;
                       }
                       setError("");       
