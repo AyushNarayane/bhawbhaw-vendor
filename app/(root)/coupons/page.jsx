@@ -436,12 +436,12 @@ const CouponsPage = () => {
           {/* Search and Filter Controls */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              {/* <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full sm:w-auto flex items-center justify-between">
                   Sort by Date
                   <FiChevronDown className="ml-2" />
                 </Button>
-              </DropdownMenuTrigger>
+              </DropdownMenuTrigger> */}
               <DropdownMenuContent className="bg-white">
                 <DropdownMenuItem 
                 onSelect={() => {

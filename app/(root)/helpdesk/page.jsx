@@ -500,12 +500,12 @@ const OrdersPage = () => {
                   </div>
                   </div>
                   <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  {/* <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="mr-4 flex items-center">
                     Sort by Date
                     <FiChevronDown className="ml-2" />
                     </Button>
-                  </DropdownMenuTrigger>
+                  </DropdownMenuTrigger> */}
                   <DropdownMenuContent className="bg-white">
                     <DropdownMenuItem onSelect={() => {
                     const sorted = [...data].sort((a, b) => {
