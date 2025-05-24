@@ -10,7 +10,7 @@ export default async function handler(req, res) {
       }
 
       const couponId = 'CID' + Math.floor(Date.now() / 1000);
-      const newCoupon = { couponTitle, discount, vendorId, minPrice, timesUsed, createdAt: new Date(), status: "Active"};
+      const newCoupon = { couponTitle, discount, vendorId, minPrice, timesUsed, createdAt: new Date(), status: "Active", global: false };
 
       await setDoc(doc(db, 'coupons', couponId), newCoupon);
 
