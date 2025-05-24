@@ -57,6 +57,8 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import Image from "next/image";
+import { storage } from "@/firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const EmptyState = ({ onAddClick }) => (
   <div className="flex flex-col items-center justify-center py-16">
@@ -102,6 +104,7 @@ const OrdersPage = () => {
   const [reopenMsg, setReopenedMsg] = useState("");
   const [selectedQuery, setSelectedQuery] = useState("");
   const [search, setSearch] = useState("id");
+  const [attachmentImage, setAttachmentImage] = useState(null);
 
   const ordersPerPage = 5;
 
@@ -245,14 +248,26 @@ const OrdersPage = () => {
     { 
       accessorKey: "status", 
       header: "Status",
-      cell: ({ row }) => (
-        <div className="pt-5 text-red-400 flex items-center gap-1 ">
-          <p className="h-2 w-2 bg-red-500 rounded-full mb-4"></p>{" "}
-          <div className=" mb-4">
-          {row.original.status}
-        </div>
-        </div>
-      )
+      cell: ({ row }) => {
+        const status = row.original.status;
+        const statusStyles = {
+          active: { bg: "bg-green-500", text: "text-green-700", bgLight: "bg-green-50" },
+          resolved: { bg: "bg-blue-500", text: "text-blue-700", bgLight: "bg-blue-50" },
+          closed: { bg: "bg-red-500", text: "text-red-700", bgLight: "bg-red-50" },
+          reopened: { bg: "bg-yellow-500", text: "text-yellow-700", bgLight: "bg-yellow-50" }
+        };
+        
+        const style = statusStyles[status] || statusStyles.active;
+        
+        return (
+          <div className={`flex items-center gap-2 ${style.bgLight} rounded-full px-3 py-1 w-fit`}>
+            <div className={`h-2 w-2 rounded-full ${style.bg}`}></div>
+            <span className={`text-sm font-medium capitalize ${style.text}`}>
+              {status}
+            </span>
+          </div>
+        );
+      }
     },
     {
       id: "actions",
@@ -307,6 +322,19 @@ const OrdersPage = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      let attachmentUrl = null;
+      
+      // Upload image if one is selected
+      if (attachmentImage) {
+        const timestamp = Date.now();
+        const fileExtension = attachmentImage.name.split('.').pop();
+        const fileName = `query_attachment_${timestamp}.${fileExtension}`;
+        const storageRef = ref(storage, `queries/${currentUser?.uid}/attachments/${fileName}`);
+        
+        await uploadBytesResumable(storageRef, attachmentImage);
+        attachmentUrl = await getDownloadURL(storageRef);
+      }
+
       // Add console.log to debug currentUser data
       console.log("Current user data:", currentUser);
       console.log("Personal details:", currentUser?.personalDetails);
@@ -316,6 +344,7 @@ const OrdersPage = () => {
         vendorUId: currentUser?.uid,
         title,
         description,
+        attachmentUrl,
         vendorDetails: {
           name: currentUser?.personalDetails?.name || '',
           email: currentUser?.personalDetails?.email || '',
@@ -324,11 +353,10 @@ const OrdersPage = () => {
           businessName: currentUser?.personalDetails?.businessName || '',
           vendorType: currentUser?.personalDetails?.vendorType || '',
           gstin: currentUser?.personalDetails?.gstin || '',
-          // Add any other relevant personal details
         }
       };
 
-      console.log("Sending payload:", payload); // Debug log
+      console.log("Sending payload:", payload);
 
       const response = await fetch('/api/addVendorQuery', {
         method: 'POST',
@@ -343,6 +371,7 @@ const OrdersPage = () => {
         console.log("Query added successfully:", result);
         setTitle("");
         setDescription("");
+        setAttachmentImage(null);
         setChanged((curr) => !curr);
         setIsQueryAdded(true);
         toast.success("Successfully Generated the Query");
@@ -363,38 +392,87 @@ const OrdersPage = () => {
     <Dialog open={viewModal} onOpenChange={handleViewClose}>
       <DialogContent className="sm:max-w-[425px] bg-white">
         <DialogHeader>
-          <DialogTitle>Query Details</DialogTitle>
+          <DialogTitle>Query Details - {item?.queryId}</DialogTitle>
+          <DialogDescription>
+            Ticket History & Responses
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Vendor Details Section */}
-          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-            <h3 className="font-semibold text-gray-700">Vendor Details</h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <p className="text-gray-600">Name</p>
-                <p>{item?.vendorDetails?.name || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-gray-600">Business</p>
-                <p>{item?.vendorDetails?.businessName || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-gray-600">Email</p>
-                <p>{item?.vendorDetails?.email || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-gray-600">Phone</p>
-                <p>{item?.vendorDetails?.phoneNumber || 'N/A'}</p>
-              </div>
+          {/* Current Status */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2">
+              <div className={`h-2 w-2 rounded-full ${
+                item?.status === 'active' ? 'bg-green-500' :
+                item?.status === 'resolved' ? 'bg-blue-500' :
+                item?.status === 'closed' ? 'bg-red-500' : 'bg-yellow-500'
+              }`} />
+              <p className="font-semibold capitalize">{item?.status || 'Unknown'}</p>
             </div>
           </div>
 
-          {/* Query Details */}
-          <div className="flex flex-col">
-            <span className="m-2">Query Title</span>
-            <Input readOnly value={item?.title || ''} className="rounded-xl" />
+          {/* Timeline */}
+          <div className="space-y-4">
+            {/* Initial Query */}
+            <div className="border-l-2 border-gray-200 pl-4 ml-2 pb-4">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm text-gray-500">
+                  {new Date(item?.createdAt?.seconds * 1000).toLocaleString()}
+                </p>
+                <p className="font-semibold">{item?.title}</p>
+                <p className="text-sm text-gray-600">{item?.description}</p>
+                {item?.attachmentUrl && (
+                  <a 
+                    href={item.attachmentUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-600 text-sm"
+                  >
+                    View Attachment
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Resolution Response */}
+            {item?.resolveMsg && (
+              <div className="border-l-2 border-blue-200 pl-4 ml-2 pb-4">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-gray-500">
+                    {new Date(item?.resolveDate?.seconds * 1000).toLocaleString()}
+                  </p>
+                  <p className="font-semibold text-blue-600">Resolved</p>
+                  <p className="text-sm text-gray-600">{item?.resolveMsg}</p>
+                  <p className="text-xs text-gray-500">by {item?.resolvedBy}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Reopen Response */}
+            {item?.reopenMsg && (
+              <div className="border-l-2 border-yellow-200 pl-4 ml-2 pb-4">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-gray-500">
+                    {new Date(item?.updatedAt?.seconds * 1000).toLocaleString()}
+                  </p>
+                  <p className="font-semibold text-yellow-600">Reopened</p>
+                  <p className="text-sm text-gray-600">{item?.reopenMsg}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Close Response */}
+            {item?.closeMsg && (
+              <div className="border-l-2 border-red-200 pl-4 ml-2">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-gray-500">
+                    {new Date(item?.updatedAt?.seconds * 1000).toLocaleString()}
+                  </p>
+                  <p className="font-semibold text-red-600">Closed</p>
+                  <p className="text-sm text-gray-600">{item?.closeMsg}</p>
+                </div>
+              </div>
+            )}
           </div>
-          {/* ... rest of the existing dialog content ... */}
         </div>
         <DialogFooter>
           <Button onClick={handleViewClose}>Close</Button>
@@ -466,6 +544,21 @@ const OrdersPage = () => {
                         placeholder="Enter the description"
                         className="col-span-3"
                         onChange={(e) => setDescription(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <Label
+                        htmlFor="attachment"
+                        className="flex w-full justify-start"
+                      >
+                        Attachment (Optional)
+                      </Label>
+                      <Input
+                        type="file"
+                        id="attachment"
+                        accept="image/*"
+                        onChange={(e) => setAttachmentImage(e.target.files[0])}
+                        className="col-span-3"
                       />
                     </div>
                   </div>
@@ -687,10 +780,11 @@ const OrdersPage = () => {
                 Cancel
               </Button>
             </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
+         
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }
 
 export default OrdersPage;

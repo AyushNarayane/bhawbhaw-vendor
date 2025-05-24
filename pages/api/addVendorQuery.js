@@ -8,7 +8,8 @@ export default async function handler(req, res) {
       title, 
       description, 
       vendorUId, 
-      vendorDetails 
+      vendorDetails,
+      attachmentUrl 
     } = req.body;
 
     // Log the received data
@@ -17,7 +18,8 @@ export default async function handler(req, res) {
       title,
       description,
       vendorUId,
-      vendorDetails
+      vendorDetails,
+      attachmentUrl
     });
 
     if (!vendorId || !title || !description || !vendorUId) {
@@ -35,6 +37,7 @@ export default async function handler(req, res) {
         updatedAt: serverTimestamp(),
         vendorUId,
         vendorId,
+        attachmentUrl: attachmentUrl || null,
         vendorDetails: {
           ...vendorDetails,
           updatedAt: serverTimestamp()
