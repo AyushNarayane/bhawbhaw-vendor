@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import toast from 'react-hot-toast';
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyA-O7p9yeKtwXARkjn3bXy5phdyDUS-RF8';
+
 const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isService }) => {
   const [formData, setFormData] = useState({
     businessName: "",
@@ -19,10 +21,89 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
   const [focusedField, setFocusedField] = useState("");
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState('');
+  const [geocoding, setGeocoding] = useState(false);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
+  const [mapsError, setMapsError] = useState('');
 
   useEffect(() => {
     setFormData(data);
+    
+    if (!GOOGLE_MAPS_API_KEY) {
+      setMapsError('Google Maps API key is not configured');
+      console.error('Google Maps API key is missing. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.');
+      return;
+    }
+
+    // Check if Google Maps API is already loaded
+    if (!window.google && !document.querySelector('script[src*="maps.googleapis.com"]')) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        setMapsLoaded(true);
+        setMapsError('');
+      };
+      
+      script.onerror = () => {
+        setMapsError('Failed to load Google Maps API');
+        console.error('Failed to load Google Maps API');
+      };
+      
+      document.head.appendChild(script);
+    } else {
+      setMapsLoaded(true);
+    }
   }, [data]);
+
+  const getCoordinates = async () => {
+    if (!GOOGLE_MAPS_API_KEY) {
+      toast.error('Google Maps API key is not configured');
+      return;
+    }
+
+    if (!formData.pickupAddress) {
+      toast.error('Please enter a pickup address first');
+      return;
+    }
+    
+    if (!window.google?.maps) {
+      toast.error('Google Maps is still loading. Please try again in a moment.');
+      return;
+    }
+    
+    setGeocoding(true);
+    try {
+      const geocoder = new window.google.maps.Geocoder();
+      const result = await new Promise((resolve, reject) => {
+        geocoder.geocode({ address: formData.pickupAddress }, (results, status) => {
+          if (status === 'OK') {
+            resolve(results[0]);
+          } else {
+            reject(status);
+          }
+        });
+      });
+
+      const { lat, lng } = result.geometry.location;
+      const newFormData = {
+        ...formData,
+        latitude: lat().toString(),
+        longitude: lng().toString()
+      };
+      setFormData(newFormData);
+      setData(newFormData);
+      toast.success('Coordinates updated successfully');
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      toast.error(error === 'ZERO_RESULTS' 
+        ? 'No coordinates found for this address' 
+        : 'Could not get coordinates from address');
+    } finally {
+      setGeocoding(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -199,24 +280,40 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
         </div>
 
         <div>
-          <input
-            type="text"
-            name="pickupAddress"
-            value={formData.pickupAddress}
-            onChange={handleChange}
-            onFocus={() => handleFocus("pickupAddress")}
-            onBlur={handleBlur}
-            className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("pickupAddress")
-                ? "border-red-500"
-                : focusedField === "pickupAddress"
-                  ? "border-gray-100"
-                  : "border-gray-300"
-              } mt-1`}
-            placeholder="Pickup Address"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              name="pickupAddress"
+              value={formData.pickupAddress}
+              onChange={handleChange}
+              onFocus={() => handleFocus("pickupAddress")}
+              onBlur={handleBlur}
+              className={`w-full p-3 sm:text-md text-sm border-b ${isEmpty("pickupAddress")
+                  ? "border-red-500"
+                  : focusedField === "pickupAddress"
+                    ? "border-gray-100"
+                    : "border-gray-300"
+                } mt-1`}
+              placeholder="Pickup Address"
+            />
+            <button
+              onClick={getCoordinates}
+              disabled={geocoding || !mapsLoaded || !!mapsError}
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-xs bg-[#85716B] text-white rounded disabled:opacity-50"
+              type="button"
+              title={mapsError || (geocoding ? 'Getting coordinates...' : 'Get coordinates from address')}
+            >
+              {geocoding ? 'Getting...' : 'Get Coordinates'}
+            </button>
+          </div>
           {isEmpty("pickupAddress") && (
             <p className="text-red-500 text-sm mt-1 text-end">
               Required field!
+            </p>
+          )}
+          {mapsError && (
+            <p className="text-red-500 text-sm mt-1">
+              {mapsError}
             </p>
           )}
         </div>
@@ -312,6 +409,7 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
               focusedField === "latitude" ? "border-gray-100" : "border-gray-300"
             } mt-1`}
             placeholder="Latitude"
+            readOnly
           />
         </div>
         <div>
@@ -326,6 +424,7 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
               focusedField === "longitude" ? "border-gray-100" : "border-gray-300"
             } mt-1`}
             placeholder="Longitude"
+            readOnly
           />
         </div>
       </div>
