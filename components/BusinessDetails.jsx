@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import toast from 'react-hot-toast';
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyA-O7p9yeKtwXARkjn3bXy5phdyDUS-RF8';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyAiNEwW5gOJZRYHU--r2pwTblvJpN_A1rk';
 
 const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isService }) => {
   const [formData, setFormData] = useState({
