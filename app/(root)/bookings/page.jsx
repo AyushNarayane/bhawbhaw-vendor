@@ -337,11 +337,11 @@ const BookingPage = () => {
       },
       {
         header: "Service",
-        accessorKey: "selectedService.serviceName",
+        accessorKey: "selectedService.serviceType",
       },
       {
         header: "Full Name",
-        accessorKey: "contactInfo.name",
+        accessorKey: "contactInfo.fullName",
       },
       {
         header: "Contact",
@@ -349,7 +349,7 @@ const BookingPage = () => {
       },
       {
         header: "Date",
-        accessorKey: "calendarAndSlot.date",
+        accessorKey: "calendarAndSlot.selectedDate",
       },
     ],
     []
@@ -433,15 +433,15 @@ const BookingPage = () => {
               <DialogDescription>
                 <div className="space-y-2">
                   <p><strong>Booking ID:</strong> {viewBooking.bookingID}</p>
-                  <p><strong>Service:</strong> {viewBooking.selectedService.serviceName}</p>
-                  <p><strong>Full Name:</strong> {viewBooking.contactInfo.name}</p>
+                  <p><strong>Service:</strong> {viewBooking.selectedService.serviceType}</p>
+                  <p><strong>Full Name:</strong> {viewBooking.contactInfo.fullName}</p>
                   <p><strong>Email:</strong> {viewBooking.contactInfo.email}</p>
                   <p><strong>Phone:</strong> {viewBooking.contactInfo.phoneNumber}</p>
                   <p><strong>Address:</strong> {viewBooking.contactInfo.address}</p>
-                  <p><strong>Date:</strong> {viewBooking.calendarAndSlot.date}</p>
-                  <p><strong>Time Slot:</strong> {viewBooking.calendarAndSlot.timeSlot}</p>
+                  <p><strong>Date:</strong> {viewBooking.calendarAndSlot.selectedDate}</p>
+                  <p><strong>Time Slot:</strong> {viewBooking.calendarAndSlot.selectedSlot}</p>
                   <p><strong>Duration:</strong> {viewBooking.calendarAndSlot.duration}</p>
-                  <p><strong>Price Per Hour:</strong> {viewBooking.selectedService.pricePerHour}</p>
+                  <p><strong>Price Per Hour:</strong> {viewBooking.selectedService.expectedSalary}</p>
                 </div>
               </DialogDescription>
             </DialogHeader>
