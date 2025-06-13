@@ -200,12 +200,10 @@ const TeamsPage = () => {
   const [editingMemberId, setEditingMemberId] = useState(null);
   const [memberData, setMemberData] = useState({
     name: "",
-   
     email: "",
     phoneNumber: "",
     department: "",
     joiningDate: "",
-    status: "unverified",
     image: null
   });
 
@@ -307,13 +305,12 @@ const TeamsPage = () => {
       // Prepare the data object, excluding the File object
       const teamMemberData = {
         name: memberData.name,
-        
         email: memberData.email,
         phoneNumber: memberData.phoneNumber,
         department: memberData.department,
         joiningDate: memberData.joiningDate,
-        status: memberData.status,
-        imageUrl: imageUrl || memberData.imageUrl, // Use existing URL if no new image
+        status: "verified", // Automatically set as verified
+        imageUrl: imageUrl || memberData.imageUrl,
         vendorId: currentUser.id,
         vendorName: currentUser?.personalDetails?.name || '',
         vendorEmail: currentUser?.personalDetails?.email || '',
@@ -352,7 +349,6 @@ const TeamsPage = () => {
       phoneNumber: "",
       department: "",
       joiningDate: "",
-      status: "unverified",
       image: null
     });
     setIsEditMode(false);
@@ -377,7 +373,6 @@ const TeamsPage = () => {
         header: "Name",
         accessorKey: "name",
       },
-     
       {
         header: "Department",
         accessorKey: "department",
@@ -385,18 +380,6 @@ const TeamsPage = () => {
       {
         header: "Email",
         accessorKey: "email",
-      },
-      {
-        header: "Status",
-        accessorKey: "status",
-        cell: ({ row }) => (
-          <span className={`px-2 py-1 rounded-full text-xs ${
-            row.original.status === 'unverified' ? 'bg-green-100 text-green-800' : 
-            'bg-red-100 text-red-800'
-          }`}>
-            {row.original.status}
-          </span>
-        ),
       },
       {
         header: "Joining Date",
@@ -423,6 +406,9 @@ const TeamsPage = () => {
           <DialogContent className="bg-white">
             <DialogHeader>
             <DialogTitle>{isEditMode ? "Edit Member" : "Add New Member"}</DialogTitle>
+            <DialogDescription className="text-red-600 font-medium">
+              Team Members should be verified by the Owner of the Account. BhawBhaw will take action against the Account Owner on any inappropriate actions.
+            </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
             <Input
