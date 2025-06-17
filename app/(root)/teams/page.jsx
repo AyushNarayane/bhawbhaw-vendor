@@ -44,6 +44,13 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db } from "@/firebase";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const TeamTable = ({ data, columns, onEdit, onDelete }) => {
   const table = useReactTable({
@@ -202,7 +209,7 @@ const TeamsPage = () => {
     name: "",
     email: "",
     phoneNumber: "",
-    department: "",
+    departments: [],
     joiningDate: "",
     image: null
   });
@@ -307,7 +314,7 @@ const TeamsPage = () => {
         name: memberData.name,
         email: memberData.email,
         phoneNumber: memberData.phoneNumber,
-        department: memberData.department,
+        departments: memberData.departments,
         joiningDate: memberData.joiningDate,
         status: "verified", // Automatically set as verified
         imageUrl: imageUrl || memberData.imageUrl,
@@ -347,7 +354,7 @@ const TeamsPage = () => {
       name: "",
       email: "",
       phoneNumber: "",
-      department: "",
+      departments: [],
       joiningDate: "",
       image: null
     });
@@ -374,8 +381,23 @@ const TeamsPage = () => {
         accessorKey: "name",
       },
       {
-        header: "Department",
-        accessorKey: "department",
+        header: "Departments",
+        accessorKey: "departments",
+        cell: ({ row }) => {
+          const departments = row.original.departments || [];
+          return (
+            <div className="space-y-1">
+              {departments.map((dept, index) => (
+                <span 
+                  key={index} 
+                  className="inline-block bg-[#F3EAE7] text-[#85716B] text-xs px-2 py-1 rounded-full mr-1 mb-1"
+                >
+                  {dept}
+                </span>
+              ))}
+            </div>
+          );
+        }
       },
       {
         header: "Email",
@@ -417,25 +439,51 @@ const TeamsPage = () => {
               onChange={(e) => setMemberData({...memberData, name: e.target.value})}
             />
            
-            <select 
-              className="w-full p-2 border rounded-md"
-              value={memberData.department}
-              onChange={(e) => setMemberData({...memberData, department: e.target.value})}
-            >
-              <option value="">Select Department</option>
-              <option value="Pet Grooming Services">Pet Grooming Services</option>
-              <option value="Pet Boarding and Daycare">Pet Boarding and Daycare</option>
-              <option value="Pet Training Services">Pet Training Services</option>
-              <option value="Pet Walking and Exercise">Pet Walking and Exercise</option>
-              <option value="Veterinary and Health Services">Veterinary and Health Services</option>
-              <option value="Pet Transportation Services">Pet Transportation Services</option>
-              <option value="Pet Nutrition Services">Pet Nutrition Services</option>
-              <option value="Specialized Care">Specialized Care</option>
-              <option value="Pet Adoption and Rescue Services">Pet Adoption and Rescue Services</option>
-              <option value="Pet Photography and Art">Pet Photography and Art</option>
-              <option value="Pet Accessories and Supplies">Pet Accessories and Supplies</option>
-              <option value="Other">Other</option>
-            </select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Departments</label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {memberData.departments.length > 0 
+                      ? `${memberData.departments.length} department(s) selected`
+                      : "Select departments"}
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full max-h-[300px] overflow-y-auto bg-white p-2">
+                  {[
+                    "Pet Grooming Services",
+                    "Pet Boarding and Daycare",
+                    "Pet Training Services",
+                    "Pet Walking and Exercise",
+                    "Veterinary and Health Services",
+                    "Pet Transportation Services",
+                    "Pet Nutrition Services",
+                    "Specialized Care",
+                    "Pet Adoption and Rescue Services",
+                    "Pet Photography and Art",
+                    "Pet Accessories and Supplies",
+                    "Other"
+                  ].map((dept) => (
+                    <DropdownMenuCheckboxItem
+                      key={dept}
+                      checked={memberData.departments.includes(dept)}
+                      onCheckedChange={(checked) => {
+                        setMemberData(prev => ({
+                          ...prev,
+                          departments: checked 
+                            ? [...prev.departments, dept]
+                            : prev.departments.filter(d => d !== dept)
+                        }));
+                      }}
+                      className="hover:bg-gray-100"
+                    >
+                      {dept}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <Input
               placeholder="Email"
               type="email"

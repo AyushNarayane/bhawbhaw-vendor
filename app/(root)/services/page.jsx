@@ -226,7 +226,8 @@ const AddServicePage = () => {
     monthlyCharges: "",
     certification: null,
     image: null,
-    teamMember: ""
+    teamMember: "",
+    department: ""
   });
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -536,6 +537,15 @@ const AddServicePage = () => {
         accessorKey: "serviceName",
       },
       {
+        header: "Department",
+        accessorKey: "department",
+        cell: ({ row }) => (
+          <span className="inline-block bg-[#F3EAE7] text-[#85716B] px-2 py-1 rounded-full text-sm">
+            {row.original.department}
+          </span>
+        )
+      },
+      {
         header: "Details",
         accessorKey: "serviceDetails",
         cell: ({ row }) => (
@@ -660,6 +670,45 @@ const AddServicePage = () => {
                 placeholder="Enter service name" 
               />
 
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Department</label>
+                <Select
+                  name="department"
+                  value={serviceData.department}
+                  onValueChange={(value) => 
+                    setServiceData(prev => ({ ...prev, department: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full bg-white border border-gray-200">
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent className="w-full bg-white">
+                    {[
+                      "Pet Grooming Services",
+                      "Pet Boarding and Daycare",
+                      "Pet Training Services",
+                      "Pet Walking and Exercise",
+                      "Veterinary and Health Services",
+                      "Pet Transportation Services",
+                      "Pet Nutrition Services",
+                      "Specialized Care",
+                      "Pet Adoption and Rescue Services",
+                      "Pet Photography and Art",
+                      "Pet Accessories and Supplies",
+                      "Other"
+                    ].map((dept) => (
+                      <SelectItem 
+                        key={dept} 
+                        value={dept}
+                        className="hover:bg-gray-100"
+                      >
+                        {dept}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <textarea
                 name="serviceDetails"
                 value={serviceData.serviceDetails}
@@ -715,21 +764,21 @@ const AddServicePage = () => {
                     setServiceData(prev => ({ ...prev, teamMember: value }))
                   }
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white border border-gray-200">
                     <SelectValue placeholder="Select team member" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     {teamMembers.map((member) => (
                       <SelectItem 
                         key={member.id} 
                         value={member.id}
-                        className="capitalize"
+                        className="capitalize hover:bg-gray-100"
                       >
                         {member.name} - {member.role}
                       </SelectItem>
                     ))}
                     {teamMembers.length === 0 && (
-                      <SelectItem value="none" disabled>
+                      <SelectItem value="none" disabled className="text-gray-400">
                         No team members available
                       </SelectItem>
                     )}
