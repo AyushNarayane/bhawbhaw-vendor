@@ -78,10 +78,7 @@ const MultiStepForm = () => {
 
       const user = userCredential.user;
 
-      // Sign out immediately after creation
-      await auth.signOut();
-
-      // Create vendor document in Firestore
+      // Create vendor document in Firestore before signing out
       const vendorDocRef = doc(db, 'vendors', userId);
       await setDoc(vendorDocRef, {
         personalDetails: formData.personalDetails,
@@ -92,6 +89,9 @@ const MultiStepForm = () => {
         uid: user.uid,
         createdAt: serverTimestamp()
       });
+
+      // Sign out immediately after creation
+      await auth.signOut();
 
       // Show success dialog
       setShowSuccessDialog(true);
