@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Footer from '@/components/Footer/Footer';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/auth-context';
+import FadeInUp from '@/components/FadeInUp';
+import { motion } from 'framer-motion';
 
 export default function HomePage() {
     const router = useRouter();
@@ -145,6 +147,7 @@ export default function HomePage() {
                 </div>
             </div>
 
+            <FadeInUp>
             <section id="ecommerce" className="flex justify-center items-center pt-20">
                 <div className="flex flex-col lg:flex-row items-center justify-between p-10 lg:p-20">
                     <div className="w-full lg:w-1/2 lg:pr-10 mb-8 lg:mb-0">
@@ -163,6 +166,7 @@ export default function HomePage() {
                     </div>
                 </div>
             </section>
+            </FadeInUp>
 
 
             <section id="howItWorks" className="py-20 px-6">
@@ -176,65 +180,52 @@ export default function HomePage() {
                         src="/shine1.png"
                         className="absolute top-20 mx-auto right-0 left-0 w-7"
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-between items-center lg:items-start">
-                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                            <Image
-                                width="300"
-                                height="300"
-                                src="/work1.png"
-                                layout="intrinsic"
-                                className="mb-4 w-32"
-                            />
-                            <h3 className="text-xl font-semibold mb-2 text-black">Sign Up</h3>
-                            <p className="text-gray-600 text-sm md:text-base max-w-xs">
-                                Create your vendor account in a few easy steps.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                            <Image
-                                width="300"
-                                height="300"
-                                src="/work2.png"
-                                layout="intrinsic"
-                                className="mb-4 w-32"
-                            />
-                            <h3 className="text-xl font-semibold mb-2 text-black">Set Up Your Store</h3>
-                            <p className="text-gray-600 text-sm md:text-base max-w-xs">
-                                Add your products or services and customize your storefront.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                            <Image
-                                width="300"
-                                height="300"
-                                src="/work3.png"
-                                layout="intrinsic"
-                                className="mb-6 w-24"
-                            />
-                            <h3 className="text-xl font-semibold mb-2 text-black">
-                                Start Selling And Offering Services
-                            </h3>
-                            <p className="text-gray-600 text-sm md:text-base max-w-xs">
-                                Customers can browse and book, while you manage everything from your dashboard.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                            <Image
-                                width="300"
-                                height="300"
-                                src="/work4.png"
-                                layout="intrinsic"
-                                className="mb-4 w-32"
-                            />
-                            <h3 className="text-xl font-semibold mb-2 text-black">Grow Your Business</h3>
-                            <p className="text-gray-600 text-sm md:text-base max-w-xs">
-                                Use our tools to track sales, manage bookings, and scale your business.
-                            </p>
-                        </div>
-                    </div>
+                    <motion.div
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-between items-center lg:items-start"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.2 }}
+                        variants={{}}
+                    >
+                        {[{
+                            img: "/work1.png",
+                            title: "Sign Up",
+                            desc: "Create your vendor account in a few easy steps."
+                        }, {
+                            img: "/work2.png",
+                            title: "Set Up Your Store",
+                            desc: "Add your products or services and customize your storefront."
+                        }, {
+                            img: "/work3.png",
+                            title: "Start Selling And Offering Services",
+                            desc: "Customers can browse and book, while you manage everything from your dashboard."
+                        }, {
+                            img: "/work4.png",
+                            title: "Grow Your Business",
+                            desc: "Use our tools to track sales, manage bookings, and scale your business."
+                        }].map((step, idx) => (
+                            <motion.div
+                                key={step.title}
+                                className="flex flex-col items-center text-center mb-8 lg:mb-0"
+                                initial={{ opacity: 0, x: 60 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.7, delay: idx * 0.25 }}
+                                viewport={{ once: true, amount: 0.2 }}
+                            >
+                                <Image
+                                    width="300"
+                                    height="300"
+                                    src={step.img}
+                                    layout="intrinsic"
+                                    className="mb-4 w-32"
+                                />
+                                <h3 className="text-xl font-semibold mb-2 text-black">{step.title}</h3>
+                                <p className="text-gray-600 text-sm md:text-base max-w-xs">
+                                    {step.desc}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 </div>
             </section>
 
@@ -265,6 +256,7 @@ export default function HomePage() {
                 <Image width="300" height="300" src='/staggered9.png' className="hidden md:block w-24 md:w-32 " />
             </div>
 
+            <FadeInUp>
             <section id="services" className="py-32 px-6">
                 <div className="px-6 sm:px-10 lg:px-20 flex flex-col lg:flex-row justify-center items-start md:pb-16 pb-5">
                     <div className="lg:w-1/2">
@@ -310,6 +302,7 @@ export default function HomePage() {
                     </div>
                 </div>
             </section>
+            </FadeInUp>
 
 
             {/* <div className='flex flex-row pb-10 gap-10 items-center justify-center relative p-10 '>
@@ -323,6 +316,7 @@ export default function HomePage() {
 
 
 
+            <FadeInUp>
             <section id="highlight" className="py-20 px-6 bg-gray-100">
                 <div className="flex flex-col sm:flex-row  items-center justify-between p-5 lg:p-20 pb-16 ">
                     <div className="w-full md:w-1/2 flex justify-center lg:mr-20">
@@ -354,48 +348,51 @@ export default function HomePage() {
                         src="/shine1.png"
                         className="absolute top-20 mx-auto right-0 left-0 w-7"
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-between items-center lg:items-start">
-                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                            <Image
-                                width="300"
-                                height="300"
-                                src="/work4.png"
-                                layout="intrinsic"
-                                className="w-52 min-h-36"
-                            />
-                            <p className="text-gray-900 text-sm md:text-lg max-w-xs">
-                                Reach more pet lovers and grow your customer base.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                            <Image
-                                width="300"
-                                height="300"
-                                src="/tool.png"
-                                layout="intrinsic"
-                                className="w-52"
-                            />
-                            <p className="text-gray-900 text-sm md:text-lg max-w-xs">
-                                Simple, efficient tools for managing your store and services.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col items-center text-center mb-8 lg:mb-0">
-                            <Image
-                                width="300"
-                                height="300"
-                                src="/work1.png"
-                                layout="intrinsic"
-                                className="mb-4 w-48"
-                            />
-                            <p className="text-gray-900 text-sm md:text-lg max-w-xs">
-                                24/7 support to help you every step of the way.
-                            </p>
-                        </div>
-                    </div>
+                    <motion.div
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-between items-center lg:items-start"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.2 }}
+                        variants={{}}
+                    >
+                        {[
+                            {
+                                img: "/work4.png",
+                                desc: "Reach more pet lovers and grow your customer base."
+                            },
+                            {
+                                img: "/tool.png",
+                                desc: "Simple, efficient tools for managing your store and services."
+                            },
+                            {
+                                img: "/work1.png",
+                                desc: "24/7 support to help you every step of the way."
+                            }
+                        ].map((item, idx) => (
+                            <motion.div
+                                key={item.img}
+                                className="flex flex-col items-center text-center mb-8 lg:mb-0"
+                                initial={{ opacity: 0, x: 60 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.7, delay: idx * 0.25 }}
+                                viewport={{ once: true, amount: 0.2 }}
+                            >
+                                <Image
+                                    width="300"
+                                    height="300"
+                                    src={item.img}
+                                    layout="intrinsic"
+                                    className={item.img === "/work1.png" ? "mb-4 w-48" : "w-52 min-h-36"}
+                                />
+                                <p className="text-gray-900 text-sm md:text-lg max-w-xs">
+                                    {item.desc}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 </div>
             </section>
+            </FadeInUp>
 
             <section className='relative max-w-4xl mx-auto sm:px-20 px-8'>
                 <h3 className='text-center text-3xl font-bold mt-20 mb-8'>FaQ</h3>
@@ -421,7 +418,7 @@ export default function HomePage() {
                     <AccordionItem value="item-3">
                         <AccordionTrigger>Are grain-free diets good for pets?</AccordionTrigger>
                         <AccordionContent>
-                            Grain-free diets may benefit pets with grain allergies, but they’re not necessary for all pets. Always consult your vet before making changes.
+                            Grain-free diets may benefit pets with grain allergies, but they're not necessary for all pets. Always consult your vet before making changes.
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-4">
