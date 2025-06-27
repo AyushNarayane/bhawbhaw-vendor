@@ -24,9 +24,9 @@ function Footer() {
         <div className="text-center lg:text-left">
           <h3 className="font-semibold text-base mb-4">Quick Links</h3>
           <ul className="space-y-2">
-            <li><Link href="/about">About</Link></li>
-            <li><Link href="/contact">Contact Us</Link></li>
-            <li><Link href="/careers">Careers</Link></li>
+            <li><Link href="https://bhawbhaw-one.vercel.app/about">About</Link></li>
+            <li><Link href="https://bhawbhaw-one.vercel.app/contact">Contact Us</Link></li>
+            <li><Link href="https://bhawbhaw-one.vercel.app/careers">Careers</Link></li>
             <li><Link href="/directories">Directories</Link></li>
           </ul>
         </div>
