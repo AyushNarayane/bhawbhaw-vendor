@@ -418,7 +418,7 @@ export default function HomePage() {
                     <AccordionItem value="item-3">
                         <AccordionTrigger>Are grain-free diets good for pets?</AccordionTrigger>
                         <AccordionContent>
-                            Grain-free diets may benefit pets with grain allergies, but they're not necessary for all pets. Always consult your vet before making changes.
+                            Grain-free diets may benefit pets with grain allergies, but they are not necessary for all pets. Always consult your vet before making changes.
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-4">
