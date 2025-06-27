@@ -726,7 +726,7 @@ const AddServicePage = () => {
                 value={serviceData.timeSlots} 
                 onChange={handleChange} 
                 required 
-                placeholder="Available time slots" 
+                placeholder="Available time slots eg: 10:00 AM - 12:00 PM" 
               />
 
               <Input 
