@@ -8,8 +8,6 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { useAuth } from '@/hooks/auth-context';
 import FadeInUp from '@/components/FadeInUp';
 import { motion } from 'framer-motion';
-import FadeInUp from '@/components/FadeInUp';
-import { motion } from 'framer-motion';
 
 export default function HomePage() {
     const router = useRouter();
