@@ -8,6 +8,8 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { useAuth } from '@/hooks/auth-context';
 import FadeInUp from '@/components/FadeInUp';
 import { motion } from 'framer-motion';
+import FadeInUp from '@/components/FadeInUp';
+import { motion } from 'framer-motion';
 
 export default function HomePage() {
     const router = useRouter();
@@ -418,7 +420,7 @@ export default function HomePage() {
                     <AccordionItem value="item-3">
                         <AccordionTrigger>Are grain-free diets good for pets?</AccordionTrigger>
                         <AccordionContent>
-                            Grain-free diets may benefit pets with grain allergies, but they are not necessary for all pets. Always consult your vet before making changes.
+                            Grain-free diets may benefit pets with grain allergies, but they’re not necessary for all pets. Always consult your vet before making changes.
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-4">
