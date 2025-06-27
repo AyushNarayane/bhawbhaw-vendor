@@ -641,13 +641,15 @@ const AddServicePage = () => {
           >
             Add New Service
           </Button>
-          <Button
-            variant="secondary"
-            className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
-            onClick={() => setIsProviderDialogOpen(true)}
-          >
-            Register as Service Provider
-          </Button>
+          {providerStatus !== 'verified' && (
+            <Button
+              variant="secondary"
+              className="bg-[#85716B] text-white hover:bg-[#6b5a55]"
+              onClick={() => setIsProviderDialogOpen(true)}
+            >
+              Register as Service Provider
+            </Button>
+          )}
         </div>
       </div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
