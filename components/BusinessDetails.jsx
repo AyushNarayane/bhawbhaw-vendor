@@ -133,14 +133,49 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
     setPincodeLoading(true);
     setPincodeError('');
 
+    // Try Google Maps Geocoding API first
+    try {
+      const geoRes = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${pincode}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      const geoData = await geoRes.json();
+      if (geoData.status === 'OK' && geoData.results.length > 0) {
+        const addressComponents = geoData.results[0].address_components;
+        let city = '';
+        let state = '';
+        for (const comp of addressComponents) {
+          if (comp.types.includes('locality')) {
+            city = comp.long_name;
+          }
+          if (comp.types.includes('administrative_area_level_2') && !city) {
+            city = comp.long_name;
+          }
+          if (comp.types.includes('administrative_area_level_1')) {
+            state = comp.long_name;
+          }
+        }
+        if (city && state) {
+          setFormData(prev => ({
+            ...prev,
+            city,
+            state,
+          }));
+          setPincodeLoading(false);
+          return true;
+        }
+      }
+    } catch (err) {
+      // Continue to fallback
+      console.error('Google Maps Geocoding failed:', err);
+    }
+
+    // Fallback to India Postal API
     try {
       const response = await fetch(
         `https://api.postalpincode.in/pincode/${pincode}`
       );
       const data = await response.json();
-      
       setPincodeLoading(false);
-      
       if (data && data[0]?.Status === "Success") {
         const postOffice = data[0]?.PostOffice?.[0];
         if (postOffice) {
@@ -152,7 +187,6 @@ const BusinessDetails = ({ data, setData, nextStep, prevStep, isEcommerce, isSer
           return true;
         }
       }
-      
       setPincodeError('Invalid PIN code');
       return false;
     } catch (error) {
