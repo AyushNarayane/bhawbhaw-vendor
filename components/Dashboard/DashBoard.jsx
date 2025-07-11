@@ -161,7 +161,7 @@ const DashBoard = () => {
         <div className="w-full">
           <DynamicComponents.GradientBarChart
             head="Revenue"
-            count="90"
+            count="0"
             Icon={true}
             darkColor="#E57373"
             lightColor="#DFA5A5"
@@ -170,7 +170,7 @@ const DashBoard = () => {
         <div className="w-full">
           <DynamicComponents.GradientBarChart
             head="Total Users"
-            count="7000"
+            count="0"
             Icon={false}
             darkColor="#FFEB3B"
             lightColor="#EFE16C"

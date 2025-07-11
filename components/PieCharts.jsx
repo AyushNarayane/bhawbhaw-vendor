@@ -3,10 +3,10 @@ import React from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 const data = [
-  { name: "Dogs", value: 46200 },
-  { name: "Fish", value: 33600 },
-  { name: "Cats", value: 33800 },
-  { name: "Others", value: 29400 }
+  { name: "Dogs", value: 0 },
+  { name: "Fish", value: 0 },
+  { name: "Cats", value: 0 },
+  { name: "Others", value: 0 }
 ];
 
 const COLORS = ["#e57373", "#a1887f", "#fff176", "#d7ccc8"];
@@ -35,7 +35,7 @@ const PetOwnersPieChart = () => (
         {data.map((entry, index) => (
           <li key={index} className="flex items-center text-gray-600">
             <span className="w-3 h-3 mr-2 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-            {`${entry.name}: ${(entry.value / 1000).toFixed(1)}K`}
+            {`${entry.name}: 0`}
           </li>
         ))}
       </ul>

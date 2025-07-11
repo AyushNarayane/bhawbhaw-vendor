@@ -56,8 +56,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useRouter } from "next/navigation"; // Add this import
-import Image from "next/image"; // Add this import
+import { useRouter } from "next/navigation"; 
+import Image from "next/image"; 
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 
@@ -190,8 +190,8 @@ const ProductTable = ({ data, columns, onEdit }) => {
 
 export default function ProductPage() {
   const [activeTab, setActiveTab] = useState("bulk");
-  const [activeSection, setActiveSection] = useState("My Products"); // Changed default
-  const [showProducts, setShowProducts] = useState("My Products"); // Changed default
+  const [activeSection, setActiveSection] = useState("My Products"); 
+  const [showProducts, setShowProducts] = useState("My Products"); 
   const [productStatus, setProductStatus] = useState("approved");
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -218,7 +218,7 @@ export default function ProductPage() {
   const { isOpen, currentModel, setClose, setOpen, data, setData } = useModel();
 
   const userId = currentUser?.id;
-  const router = useRouter(); // Add this line
+  const router = useRouter(); 
 
   const Categories = [
     "Dog Food",
@@ -558,7 +558,8 @@ const handleFileUpload = (event) => {
       'MATERIAL': 'material',
       'Size': 'size',
       'Days of Dispatch': 'dispatchDays',
-      'Warranty (optional)': 'warranty'
+      'Warranty (optional)': 'warranty',
+      'Image URLs': 'images'
     };
 
     // Transform the data using the mapping
@@ -600,26 +601,51 @@ const handleFileUpload = (event) => {
     }
 
     try {
-      // Upload data to Firestore
-      for (const row of transformedData) {
-        const timestamp = Math.floor(Date.now() / 1000);
-        const generatedId = `PID${timestamp}`;
-        
-        await setDoc(
-          doc(db, "products", generatedId),
-          {
-            ...row,
+      const generatedIds = [];
+      const productsWithImages = [];
+      const productsWithoutImages = [];
+
+      transformedData.forEach((product) => {
+        const generatedId = `PID${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        generatedIds.push(generatedId);
+
+        if (product.images) {
+          productsWithImages.push({
+            ...product,
             productId: generatedId,
             vendorId: userId,
             createdAt: new Date(),
             updatedAt: new Date(),
             status: "disabled",
-          },
+            images: Array.isArray(product.images) ? product.images : [product.images]
+          });
+        } else {
+          productsWithoutImages.push({
+            ...product,
+            productId: generatedId,
+            vendorId: userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            status: "disabled",
+            images: []
+          });
+        }
+      });
+
+      if (productsWithoutImages.length > 0) {
+        toast.warning("Some products have no images. Please add images later by editing the products.");
+      }
+
+      // Upload data to Firestore
+      for (const product of [...productsWithImages, ...productsWithoutImages]) {
+        await setDoc(
+          doc(db, "products", product.productId),
+          product,
           { merge: true }
         );
       }
 
-      setData(transformedData);
+      setData([...productsWithImages, ...productsWithoutImages]);
       setOpen("bulkUploadForm");
       toast.success("Products uploaded successfully!");
     } catch (error) {

@@ -1,13 +1,12 @@
-
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const data = [
-  { name: "Aug 14", uv: 4500 },
-  { name: "Aug 15", uv: 4000 },
-  { name: "Aug 16", uv: 5900 },
-  { name: "Aug 17", uv: 3000 },
-  { name: "Aug 18", uv: 1500 },
+  { name: "Aug 14", uv: 0 },
+  { name: "Aug 15", uv: 0 },
+  { name: "Aug 16", uv: 0 },
+  { name: "Aug 17", uv: 0 },
+  { name: "Aug 18", uv: 0 },
 ];
 
 const CustomTooltip = ({ active, payload, label }) => 
@@ -21,7 +20,7 @@ const BarGraph = () => (
   <div className="flex-1 p-4 rounded-lg bg-[#F4F1F0] w-full">
     <h3 className="text-lg font-semibold text-gray-800 mb-4">New Users</h3>
     <div className="flex items-center mb-4">
-      <span className="bg-red-100 px-2 py-1 rounded-full text-red-500">-0.1%</span>
+      <span className="bg-red-100 px-2 py-1 rounded-full text-red-500">0%</span>
       <p className="text-gray-600 ml-2">From Last Period</p>
     </div>
     <ResponsiveContainer width="100%" height={300}>

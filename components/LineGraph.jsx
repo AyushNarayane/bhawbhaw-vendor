@@ -5,12 +5,12 @@ import {
 } from 'recharts';
 
 const data = [
-  { name: 'Point 1', value: 400 },
-  { name: 'Point 2', value: 300 },
-  { name: 'Point 3', value: 500 },
-  { name: 'Point 4', value: 700 },  // Highlight this point
-  { name: 'Point 5', value: 600 },
-  { name: 'Point 6', value: 800 },
+  { name: 'Point 1', value: 0 },
+  { name: 'Point 2', value: 0 },
+  { name: 'Point 3', value: 0 },
+  { name: 'Point 4', value: 0 },
+  { name: 'Point 5', value: 0 },
+  { name: 'Point 6', value: 0 },
 ];
 
 const CustomLineChart = () => {
@@ -19,7 +19,7 @@ const CustomLineChart = () => {
       {/* Header Text aligned to the left */}
       <div className="w-full text-left mb-4">
         <h4 className="text-sm font-semibold text-gray-600">Savings</h4>
-        <p className="text-lg font-bold text-gray-800">Rs. 7000</p>
+        <p className="text-lg font-bold text-gray-800">Rs. 0</p>
       </div>
 
       {/* Responsive Container for the Line Chart */}

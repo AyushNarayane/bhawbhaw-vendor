@@ -9,9 +9,9 @@ import {
 } from "recharts";
 
 const data = [
-  { subject: "Pending", A: 220 },
-  { subject: "Active", A: 138},
-  { subject: "Inactive", A: 196 },
+  { subject: "Pending", A: 0 },
+  { subject: "Active", A: 0 },
+  { subject: "Inactive", A: 0 },
 ];
 
 const SpiderChart = ({ head }) => (
